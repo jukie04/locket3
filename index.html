@@ -1,53 +1,141 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@1,700&family=Dancing+Script:wght@700&family=Courier+Prime:wght@700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Locket Uploader & Photobooth</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
+  body{font-family:"Inter",system-ui,-apple-system,sans-serif;letter-spacing:-0.01em;-webkit-font-smoothing:antialiased; font-weight: 400; background-color: #121212;}
+  .font-medium { font-weight: 500 !important; }
+  .font-semibold { font-weight: 600 !important; }
+  .font-bold, b, strong { font-weight: 700 !important; } 
+
+  aside { background-color: #18181b; border-right: 1px solid #27272a; }
+  .nav-item { padding-top: 14px; padding-bottom: 14px; font-size: 14px; transition: all 0.2s; }
+  .nav-item span { font-weight: 500; }
+  
+  .nav-item.bg-\[\#3b3224\] { background-color: #3b3224 !important; }
+  .nav-item.bg-\[\#3b3224\] span { font-weight: 600; color: #facc15; }
+  .nav-item.bg-\[\#3b3224\] svg { color: #facc15; }
+
   .seg-on{background:#fff;color:#111}
   .ring-y{outline:3px solid #facc15;outline-offset:2px}
   #recipRow::-webkit-scrollbar,#presetList::-webkit-scrollbar{display:none}
-  body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;letter-spacing:.01em;-webkit-font-smoothing:antialiased}
   :root{--bg:#18181b;--feed:linear-gradient(180deg,#141414 0%,#19140a 65%,#2b2006 100%)}
   body[data-theme=gold]{--bg:linear-gradient(180deg,#141414 0%,#1d1708 60%,#33250a 100%);--feed:var(--bg)}
   body[data-theme=rose]{--bg:linear-gradient(180deg,#141414 0%,#1d1015 60%,#3a1424 100%);--feed:var(--bg)}
   body[data-theme=ocean]{--bg:linear-gradient(180deg,#0f1417 0%,#0b1b24 60%,#0b2f42 100%);--feed:var(--bg)}
   body.manh{font-weight:300} body.manh .font-medium{font-weight:400} body.manh .font-semibold{font-weight:500}
+
+  .pb-pattern { background-size: cover; background-position: center; background-repeat: no-repeat; }
+  .pb-sunset { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); }
+  .pb-sky { background: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%); }
+  .pb-halloween { background-color: #2b1b17; background-image: radial-gradient(#ff8c00 20%, transparent 20%), radial-gradient(#ff8c00 20%, transparent 20%); background-size: 20px 20px; background-position: 0 0, 10px 10px; }
+  .pb-christmas { background-color: #0f5132; background-image: radial-gradient(#fff 10%, transparent 10%), radial-gradient(#fff 10%, transparent 10%); background-size: 30px 30px; background-position: 0 0, 15px 15px; }
+  .pb-valentine { background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%); }
+  .pb-birthday { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
+
+  @media (max-width: 768px) {
+    aside { display: none !important; }
+    .mobile-nav { 
+      display: flex !important; position: fixed; bottom: 0; left: 0; right: 0; 
+      background: rgba(24, 24, 27, 0.95); backdrop-filter: blur(10px);
+      border-top: 1px solid #27272a; z-index: 50; padding: 8px 0;
+      justify-content: space-around; align-items: center;
+    }
+    .mobile-nav button { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #a1a1aa; font-size: 10px; }
+    .mobile-nav button.active { color: #facc15; }
+    .mobile-nav svg { width: 22px; height: 22px; }
+    .main-content { height: calc(100vh - 60px); padding-bottom: 60px; }
+    #camCol { width: 100% !important; }
+  }
 </style>
 </head>
 <body class="bg-[#18181b] text-white flex h-screen overflow-hidden">
 
-<!-- Đăng nhập -->
-<div id="loginModal" class="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center">
-  <div class="bg-[#27272a] border border-zinc-700 rounded-2xl p-6 w-80 space-y-3">
-    <h2 class="font-bold text-lg">Đăng nhập Locket</h2>
-    <input id="loginEmail" type="email" placeholder="Email" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-sm">
-    <input id="loginPass" type="password" placeholder="Mật khẩu" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-sm">
-    <label class="flex items-start gap-2 text-xs text-zinc-400"><input id="saveAcc" type="checkbox" class="mt-0.5"> Lưu tài khoản trên máy này để đổi nhanh (mật khẩu lưu dạng văn bản thường, chỉ dùng trên máy cá nhân)</label>
-    <button id="loginBtn" onclick="doLogin()" class="w-full bg-yellow-400 text-black font-semibold rounded-xl py-2">Đăng nhập</button>
-    <p id="loginError" class="text-red-400 text-xs min-h-[1rem]"></p>
+<!-- Màn hình Đăng nhập (Giao diện 2 cột chuẩn) -->
+<div id="loginModal" class="fixed inset-0 bg-[#0a0a0a] z-[100] flex items-center justify-center p-4">
+  <div class="bg-[#1c1c1e] rounded-3xl overflow-hidden flex flex-col md:flex-row w-full max-w-[900px] shadow-2xl border border-zinc-800/50">
+    
+    <!-- Cột trái: Giới thiệu -->
+    <div class="w-full md:w-1/2 p-10 flex flex-col justify-center relative overflow-hidden bg-gradient-to-br from-[#2a2215] to-[#12100d]">
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      
+      <div class="relative z-10">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-300 to-amber-500 flex items-center justify-center shadow-[0_0_30px_rgba(245,158,11,0.2)] mb-6">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="#7c4a03"><path d="M12 21s-8-4.9-8-11A4.5 4.5 0 0 1 12 7.5 4.5 4.5 0 0 1 20 10c0 6.1-8 11-8 11z"/></svg>
+        </div>
+        <h1 class="text-3xl font-bold text-white mb-3">Locket Photobooth</h1>
+        <p class="text-[15px] text-zinc-400 leading-relaxed">
+          Chụp photobooth, đăng ảnh & video lên Locket, kèm nhãn caption gradient, thả cảm xúc và trò chuyện với bạn bè.
+        </p>
+      </div>
+    </div>
+
+    <!-- Cột phải: Form Đăng nhập -->
+    <div class="w-full md:w-1/2 p-8 md:p-12 bg-[#1c1c1e] flex flex-col justify-center">
+      <h2 class="text-2xl font-bold text-white mb-8">Đăng nhập</h2>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs font-semibold text-zinc-500 mb-1.5 block uppercase tracking-wide">Email</label>
+          <input id="loginEmail" type="email" placeholder="ban@email.com" class="w-full bg-[#2c2c2e] border border-zinc-700/50 rounded-xl px-4 py-3.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-yellow-500/50 transition">
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-zinc-500 mb-1.5 block uppercase tracking-wide">Mật khẩu</label>
+          <input id="loginPass" type="password" placeholder="Nhập mật khẩu" class="w-full bg-[#2c2c2e] border border-zinc-700/50 rounded-xl px-4 py-3.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-yellow-500/50 transition">
+        </div>
+      </div>
+
+      <button id="loginBtn" onclick="doLogin()" class="w-full bg-gradient-to-r from-[#fde047] to-[#fb923c] hover:from-[#facc15] hover:to-[#f97316] text-black font-bold text-[15px] rounded-xl py-3.5 mt-6 transition shadow-lg shadow-yellow-500/10">
+        Đăng nhập
+      </button>
+      
+      <p id="loginError" class="text-red-400 text-xs text-center mt-3 min-h-[1rem]"></p>
+
+      <button onclick="installApp()" class="w-full bg-[#2c2c2e] hover:bg-zinc-700 text-zinc-300 font-medium text-[14px] rounded-xl py-3.5 mt-3 transition flex items-center justify-center gap-2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></svg>
+        Cài ứng dụng vào máy
+      </button>
+
+      <p class="text-xs text-zinc-500 text-center mt-6 leading-relaxed">
+        Bằng việc đăng nhập, bạn đồng ý với <a href="#" class="text-yellow-500 hover:underline">Điều khoản sử dụng</a> và <a href="#" class="text-yellow-500 hover:underline">Chính sách quyền riêng tư</a>.
+      </p>
+    </div>
+    
   </div>
 </div>
 
 <!-- Bảng cài đặt Photobooth -->
 <div id="pbModal" class="fixed inset-0 bg-black/60 z-[90] hidden items-center justify-center p-4">
-  <div class="bg-[#2c2c2f] rounded-3xl w-full max-w-[26rem] flex flex-col" style="max-height:92vh">
-    <div class="relative px-5 pt-5 pb-2 text-center shrink-0">
-      <h3 class="font-bold text-lg">Photobooth</h3>
-      <button onclick="pbCancel()" class="absolute right-4 top-4 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20" title="Đóng">✕</button>
+  <div class="bg-[#2c2c2f] rounded-3xl p-5 w-full max-w-sm max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between mb-4">
+        <button onclick="pbTab('auto')" id="pbt-auto" class="flex-1 py-2 bg-zinc-700 text-white rounded-lg font-medium text-sm">Tự động</button>
+        <button onclick="pbTab('single')" id="pbt-single" class="flex-1 py-2 text-zinc-400 font-medium text-sm">Từng ảnh</button>
+        <button onclick="hide($('pbModal'))" class="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center ml-2 text-xs">✕</button>
     </div>
-    <div id="pbBody" class="px-5 pb-3 overflow-y-auto flex-1 min-h-0"></div>
-    <div class="px-5 pb-5 pt-2 shrink-0">
-      <button onclick="pbDone()" class="w-full bg-gradient-to-r from-yellow-400 to-orange-400 text-black font-bold rounded-xl py-3">Xong</button>
-      <button id="pbOff" onclick="pbOff()" class="w-full text-xs text-zinc-400 mt-2 py-1 hidden">Tắt Photobooth</button>
-    </div>
+    
+    <p class="font-semibold text-sm mb-2">Hẹn giờ mỗi ảnh</p>
+    <div id="pbTimer" class="flex bg-zinc-700/60 rounded-xl p-1 mb-4 text-sm font-semibold text-zinc-300"></div>
+    
+    <p class="font-semibold text-sm mb-2">Kiểu</p>
+    <div id="pbLayout" class="grid grid-cols-3 gap-3 mb-4"></div>
+    
+    <p class="font-semibold text-sm mb-3">Khung</p>
+    <p class="text-xs text-zinc-400 mb-2">Màu trơn</p>
+    <div id="pbColor" class="flex gap-3 mb-4 overflow-x-auto pb-2"></div>
+    
+    <p class="text-xs text-zinc-400 mb-2">Hoạ tiết / Mẫu</p>
+    <div id="pbPattern" class="grid grid-cols-4 gap-3 mb-4"></div>
+    
+    <button onclick="pbDone()" class="w-full bg-gradient-to-r from-yellow-400 to-orange-400 text-black font-bold rounded-xl py-3 mt-2">Lưu cài đặt</button>
+    <button id="pbOff" onclick="pbOff()" class="w-full text-xs text-zinc-400 mt-2 py-1 hidden">Tắt Photobooth</button>
   </div>
 </div>
-<input type="file" id="pbFrameInput" accept="image/*" class="hidden">
 
 <!-- Đổi tài khoản -->
 <div id="accModal" class="fixed inset-0 bg-black/70 z-[100] hidden items-center justify-center p-4">
@@ -59,13 +147,45 @@
   </div>
 </div>
 
-<!-- Menu ba chấm của khoảnh khắc -->
-<div id="postSheet" class="fixed inset-0 bg-black/50 z-[96] hidden items-end justify-center" onclick="if(event.target===this)closePostMenu()">
-  <div class="w-full max-w-md bg-[#2c2c2e] rounded-t-3xl pt-2 pb-3 text-center">
-    <button onclick="postShare()" class="w-full py-4 text-[17px] font-semibold hover:bg-white/5">Chia sẻ</button>
-    <button onclick="postDownload()" class="w-full py-4 text-[17px] font-semibold hover:bg-white/5">Tải về</button>
-    <button onclick="postHide()" class="w-full py-4 text-[17px] font-semibold text-[#ff453a] hover:bg-white/5">Ẩn khỏi feed</button>
-    <button onclick="closePostMenu()" class="w-full py-4 text-[17px] font-semibold text-zinc-300 hover:bg-white/5">Huỷ</button>
+<!-- Xem ảnh -->
+<div id="lightbox" class="fixed inset-0 bg-black/85 z-[95] hidden items-center justify-center p-4" onclick="if(event.target===this)closeMoment()">
+  <div class="bg-[#27272a] rounded-3xl p-4 w-full max-w-md">
+    <div id="lbMedia"></div>
+    <p id="lbCap" class="mt-3 text-sm font-medium"></p>
+    <p id="lbInfo" class="text-xs text-zinc-400 mt-1"></p>
+    <div class="flex gap-2 mt-3">
+      <button id="lbDel" onclick="deleteMoment()" class="flex-1 bg-red-500/15 text-red-400 rounded-xl py-2 text-sm font-semibold">Xóa ảnh</button>
+      <button onclick="closeMoment()" class="flex-1 bg-zinc-700 rounded-xl py-2 text-sm font-semibold">Đóng</button>
+    </div>
+  </div>
+</div>
+
+<!-- Menu hành động bạn bè -->
+<div id="friendSheet" class="fixed inset-0 bg-black/60 z-[96] hidden items-center justify-center p-4" onclick="if(event.target===this)closeFriendSheet()">
+  <div class="bg-[#2b2b2d] rounded-3xl w-full max-w-xs text-center overflow-hidden">
+    <div class="py-4 border-b border-white/10"><div id="fsName" class="font-semibold text-[15px]"></div><div id="fsUser" class="text-xs text-zinc-400 mt-0.5"></div></div>
+    <button onclick="fsChat()" class="w-full py-3.5 text-[15px] font-medium hover:bg-white/5">💬 Nhắn tin</button>
+    <button onclick="fsRemove()" class="w-full py-3.5 text-[15px] font-medium text-red-400 hover:bg-white/5">👋 Xoá bạn</button>
+    <button onclick="fsBlock()" class="w-full py-3.5 text-[15px] font-medium text-red-400 hover:bg-white/5">🚫 Chặn</button>
+    <button onclick="closeFriendSheet()" class="w-full py-3.5 text-[15px] font-medium border-t border-white/10 hover:bg-white/5">Huỷ</button>
+  </div>
+</div>
+
+<!-- Chọn bạn để nhắn mới -->
+<div id="pickModal" class="fixed inset-0 bg-black/60 z-[96] hidden items-center justify-center p-4" onclick="if(event.target===this)hide($('pickModal'))">
+  <div class="bg-[#27272a] rounded-3xl p-4 w-full max-w-sm max-h-[80vh] flex flex-col">
+    <div class="flex items-center justify-between mb-3"><h3 class="font-semibold">Tin nhắn mới</h3><button onclick="hide($('pickModal'))" class="w-8 h-8 rounded-full bg-zinc-700">✕</button></div>
+    <input id="pickQ" oninput="renderPick()" placeholder="Tìm bạn bè..." class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-sm mb-2">
+    <div id="pickList" class="overflow-y-auto"></div>
+  </div>
+</div>
+
+<!-- Gửi khoảnh khắc của bạn vào chat -->
+<div id="attachModal" class="fixed inset-0 bg-black/60 z-[96] hidden items-center justify-center p-4" onclick="if(event.target===this)hide($('attachModal'))">
+  <div class="bg-[#27272a] rounded-3xl p-4 w-full max-w-md max-h-[80vh] flex flex-col">
+    <div class="flex items-center justify-between mb-3"><h3 class="font-semibold">Gửi khoảnh khắc của bạn</h3><button onclick="hide($('attachModal'))" class="w-8 h-8 rounded-full bg-zinc-700">✕</button></div>
+    <p id="attachStatus" class="text-xs text-zinc-400"></p>
+    <div id="attachGrid" class="grid grid-cols-3 gap-2 overflow-y-auto"></div>
   </div>
 </div>
 
@@ -90,8 +210,8 @@
   </div>
 </div>
 
-<!-- Sidebar -->
-<div class="w-56 shrink-0 bg-[#18181b] border-r border-zinc-800 flex flex-col justify-between p-4">
+<!-- Sidebar (Desktop) -->
+<aside class="w-56 shrink-0 bg-[#18181b] border-r border-zinc-800 flex flex-col justify-between p-4">
   <div>
     <div class="flex items-center gap-3 mb-8 px-2">
       <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-yellow-300 to-amber-500 flex items-center justify-center"><svg width="18" height="18" viewBox="0 0 24 24" fill="#7c4a03"><path d="M12 21s-8-4.9-8-11A4.5 4.5 0 0 1 12 7.5 4.5 4.5 0 0 1 20 10c0 6.1-8 11-8 11z"/></svg></div>
@@ -100,8 +220,16 @@
     <nav class="space-y-0.5 overflow-y-auto">
       <a href="#" data-view="upload" onclick="showView('upload');return false" class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-[13px] font-medium text-zinc-400 hover:bg-white/5 hover:text-white"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" ><circle cx="12" cy="12" r="9.5"/><path d="M8 12h8M12 8v8"/></svg><span>Đăng ảnh</span></a>
       <a href="#" data-view="feed" onclick="showView('feed');return false" class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-[13px] font-medium text-zinc-400 hover:bg-white/5 hover:text-white"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" ><path d="M3.5 10.5 12 3.5l8.5 7V19a1.5 1.5 0 0 1-1.5 1.5h-4.5V15h-5v5.5H5A1.5 1.5 0 0 1 3.5 19z"/></svg><span>Khoảnh khắc</span></a>
+      <a href="#" data-view="all" onclick="showView('all');return false" class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-[13px] font-medium text-zinc-400 hover:bg-white/5 hover:text-white"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" ><rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/></svg><span>Tất cả ảnh</span></a>
+      <a href="#" data-view="chat" onclick="showView('chat');return false" class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-[13px] font-medium text-zinc-400 hover:bg-white/5 hover:text-white"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" ><path d="M20.5 11.5a8.5 8.5 0 0 1-12.4 7.5L3.5 20.5l1.4-4.3A8.5 8.5 0 1 1 20.5 11.5z"/></svg><span>Tin nhắn</span><span id="chatBadge" class="hidden flex ml-auto min-w-[20px] h-5 px-1.5 rounded-full bg-yellow-400 text-black text-[11px] font-semibold leading-none items-center justify-center">0</span></a>
+      <a href="#" data-view="friends" onclick="showView('friends');return false" class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-[13px] font-medium text-zinc-400 hover:bg-white/5 hover:text-white"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" ><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.7a3.5 3.5 0 0 1 0 6.6M18.5 14.6c1.8.8 3 2.6 3 5.4"/></svg><span>Bạn bè</span></a>
+      <a href="#" data-view="memories" onclick="showView('memories');return false" class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-[13px] font-medium text-zinc-400 hover:bg-white/5 hover:text-white">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Kỷ niệm</span>
+      </a>
       <a href="#" data-view="donate" onclick="showView('donate');return false" class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-[13px] font-medium text-zinc-400 hover:bg-white/5 hover:text-white"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" ><path d="M12 20.5s-8-4.9-8-11A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 8 2.5c0 6.1-8 11-8 11z"/></svg><span>Ủng hộ</span></a>
       <a href="#" data-view="profile" onclick="showView('profile');return false" class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-[13px] font-medium text-zinc-400 hover:bg-white/5 hover:text-white"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" ><circle cx="12" cy="8" r="4"/><path d="M4.5 21c0-4 3.4-6.5 7.5-6.5s7.5 2.5 7.5 6.5"/></svg><span>Hồ sơ</span></a>
+      <a href="#" id="navCard" data-view="card" onclick="showView('card');return false" class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-[13px] font-medium text-zinc-400 hover:bg-white/5 hover:text-white"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" ><rect x="4" y="3.5" width="16" height="17" rx="3.2"/><path d="M12 16s-3-1.9-3-4.2a1.7 1.7 0 0 1 3-1.1 1.7 1.7 0 0 1 3 1.1c0 2.3-3 4.2-3 4.2z" fill="#facc15" stroke="none"/></svg><span>Làm thiệp online</span></a>
       <button id="navAcc" onclick="openAccounts()" class="w-full text-left flex items-center gap-3 px-3 py-3 rounded-xl text-[13px] font-medium text-zinc-400 hover:bg-white/5 hover:text-white"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" ><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20.5c0-3.6 2.9-6 6.5-6 1.1 0 2.1.2 3 .6"/><path d="M15 17.5h6m0 0-2-2m2 2-2 2"/></svg><span>Đổi tài khoản</span></button>
     </nav>
   </div>
@@ -109,9 +237,9 @@
     <p id="userInfo" class="px-3 pb-2 text-xs text-zinc-500 truncate"></p>
     <button onclick="logout()" class="w-full text-left px-3 py-2 text-xs text-zinc-500 hover:text-red-400 rounded-xl">Đăng xuất</button>
   </div>
-</div>
+</aside>
 
-<div class="flex-1 relative overflow-hidden" style="background:var(--bg)">
+<div class="flex-1 relative overflow-hidden flex flex-col main-content" style="background:var(--bg)">
 
   <!-- ĐĂNG ẢNH -->
   <div id="view-upload" class="view absolute inset-0 flex flex-col items-center justify-center p-4">
@@ -120,17 +248,12 @@
       <video id="webcam" autoplay playsinline muted style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"></video>
       <canvas id="cam" class="w-full h-full object-cover"></canvas>
       <button id="fxBtn" onclick="openFx()" class="absolute top-3 right-3 z-20 w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/10" title="Bộ lọc & hiệu ứng"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" ><path d="M4 20 15 9"/><path d="m13.5 7.5 3 3"/><path d="M18.5 3v3.5M16.8 4.8h3.4"/><path d="M6.5 3.5v2.5M5.2 4.8h2.6"/><path d="M19.5 14v2.5M18.2 15.2h2.6"/></svg></button>
-      <button id="recBtn" onclick="openRec()" class="absolute top-[7.5rem] right-3 z-20 w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/10" title="Quay video"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.8" fill="currentColor" stroke="none"/></svg></button>
-      <button id="faceBtn" onclick="openFace()" class="absolute top-[5.25rem] right-3 z-20 w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/10" title="Hiệu ứng khuôn mặt"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11.5" cy="12.5" r="8"/><path d="M8.3 14.8c.8 1 1.8 1.5 3.2 1.5s2.4-.5 3.2-1.5"/><circle cx="9" cy="11" r=".9" fill="currentColor"/><circle cx="14" cy="11" r=".9" fill="currentColor"/><path d="M19.5 2.5v3.5M17.8 4.2h3.4"/></svg></button>
       <button onclick="openPb()" class="absolute top-12 right-3 z-20 w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/10" title="Photobooth"><span id="pbBtnIcon" class="flex"></span></button>
       <div id="cdNum" class="hidden absolute inset-0 z-30 flex items-center justify-center text-white text-[9rem] font-black pointer-events-none" style="text-shadow:0 4px 24px rgba(0,0,0,.5)">3</div>
       <div id="pbPill" class="hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-20 bg-black/55 rounded-full px-3 py-1 text-xs font-semibold whitespace-nowrap"></div>
       <div id="slots" class="hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-20 gap-2"></div>
       <button id="flashBtn" onclick="toggleFlash()" class="absolute top-3 left-3 z-20 w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/10" title="Flash"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M13 2 4.5 13.5H11L10 22l8.5-11.5H12z"/></svg></button>
-      <button id="dualBtn" onclick="toggleDual()" class="absolute bottom-4 left-3 z-20 w-9 h-9 rounded-full bg-black/35 backdrop-blur-sm flex items-center justify-center hover:bg-black/50" title="Dual camera: chụp cả camera trước và sau"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="3.5"/><rect x="7.5" y="7.5" width="6" height="6" rx="1.5" fill="currentColor" stroke="none"/></svg></button>
-      <button id="boomBtn" onclick="toggleBoom()" class="absolute bottom-4 right-3 z-20 w-9 h-9 rounded-full bg-black/35 backdrop-blur-sm flex items-center justify-center hover:bg-black/50" title="Boomerang"><span class="border-[1.5px] border-current rounded-[5px] px-1 py-[2px] text-[8px] font-extrabold leading-none">GIF</span></button>
       <div id="flashLayer" class="hidden absolute inset-0 z-[25] bg-white pointer-events-none" style="opacity:.92"></div>
-      <button id="manualCancel" onclick="manualCancel()" class="hidden absolute top-3 left-1/2 -translate-x-1/2 z-30 bg-black/55 hover:bg-black/70 rounded-full px-4 py-1.5 text-xs font-semibold">✕ Huỷ phiên chụp</button>
       <div id="recBadge" class="hidden absolute top-4 left-1/2 -translate-x-1/2 z-30 items-center gap-2 bg-black/55 rounded-full px-3 py-1 text-xs font-semibold"><span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span><span id="recTime">0:00</span></div>
     </div>
 
@@ -145,37 +268,6 @@
       <button id="swBtn" onclick="switchCamera()" class="w-14 h-14 rounded-full bg-zinc-800 text-zinc-200 flex items-center justify-center shrink-0" title="Đổi camera"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" ><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg></button>
     </div>
     <button onclick="showView('feed')" class="mt-3 flex items-center gap-1 text-[13px] font-medium text-zinc-400 hover:text-white">Lịch sử <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" ><path d="m6 9 6 6 6-6"/></svg></button>
-    </div>
-
-    <!-- Quay video -->
-    <div id="recSheet" class="hidden absolute bottom-0 inset-x-0 z-30">
-      <div class="mx-auto max-w-md bg-[#241f22]/95 backdrop-blur rounded-t-3xl pt-2 pb-4 px-4">
-        <div class="mx-auto w-10 h-1 rounded-full bg-white/25 mb-2 cursor-pointer" onclick="closeFx()"></div>
-        <div class="flex items-center justify-between">
-          <h3 class="font-semibold text-[17px]">Quay video</h3>
-          <button onclick="closeFx()" class="w-9 h-9 rounded-full bg-yellow-400 text-black font-bold">✓</button>
-        </div>
-        <p class="text-xs text-zinc-400 mt-3 mb-2">Thời gian quay</p>
-        <div id="recSecs" class="flex bg-zinc-700/60 rounded-xl p-1 text-sm font-semibold text-zinc-300"></div>
-        <p class="text-xs text-zinc-400 mt-4 mb-2">Hiệu ứng</p>
-        <div id="recFx" class="flex gap-4 p-1.5 -m-1.5"></div>
-        <p id="recHint" class="text-xs text-zinc-400 mt-3 min-h-[1rem]"></p>
-        <p class="text-xs text-zinc-500 mt-1 text-center">Đóng bảng này rồi bấm nút quay: đếm ngược 3 giây và bắt đầu quay.</p>
-        <button onclick="recOff()" class="block mx-auto text-xs text-zinc-400 mt-3">Tắt chế độ quay video</button>
-      </div>
-    </div>
-
-    <!-- Hiệu ứng khuôn mặt -->
-    <div id="faceSheet" class="hidden absolute bottom-0 inset-x-0 z-30">
-      <div class="mx-auto max-w-md bg-[#241f22]/95 backdrop-blur rounded-t-3xl pt-2 pb-4 px-4 overflow-y-auto" style="max-height:62vh">
-        <div class="mx-auto w-10 h-1 rounded-full bg-white/25 mb-2 cursor-pointer" onclick="closeFx()"></div>
-        <div class="flex items-center justify-between">
-          <span id="faceHint" class="text-xs text-zinc-400"></span>
-          <button onclick="closeFx()" class="w-9 h-9 rounded-full bg-yellow-400 text-black font-bold">✓</button>
-        </div>
-        <div id="faceList"></div>
-        <button onclick="faceClear()" class="block mx-auto text-xs text-zinc-400 mt-3">Tắt hiệu ứng khuôn mặt</button>
-      </div>
     </div>
 
     <!-- Sheet bộ lọc -->
@@ -205,7 +297,6 @@
       <div class="m-auto flex flex-col items-center" style="width:min(100%,calc(100vh - 250px),560px)">
         <div id="sendCard" class="relative w-full aspect-square overflow-hidden bg-black" style="border-radius:9%">
           <img id="sendImg" class="w-full h-full object-contain" alt="">
-          <div id="dualCtl" class="hidden absolute left-3 bottom-16 z-10 flex-col gap-3"><button onclick="dualSwap()" class="w-11 h-11 rounded-full bg-black/45 backdrop-blur text-white flex items-center justify-center hover:bg-black/60" title="Đổi ảnh chính và ảnh nhỏ"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h12M16 4l3 3-3 3M17 17H5M8 14l-3 3 3 3"/></svg></button><button onclick="dualLayout()" class="w-11 h-11 rounded-full bg-black/45 backdrop-blur text-white flex items-center justify-center hover:bg-black/60" title="Đổi vị trí ảnh nhỏ"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="3.5"/><rect x="7.5" y="7.5" width="6" height="6" rx="1.5" fill="currentColor" stroke="none"/></svg></button></div>
           <video id="sendVid" class="hidden w-full h-full object-contain" loop muted playsinline onclick="this.muted=!this.muted" title="Chạm để bật/tắt tiếng"></video>
           <button onclick="downloadPending()" class="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-black/40 backdrop-blur text-white flex items-center justify-center hover:bg-black/60" title="Tải về máy"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" ><path d="M12 4v11"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></svg></button>
           <button id="capPill" onclick="openCaption()" class="absolute bottom-4 left-1/2 -translate-x-1/2 max-w-[90%] truncate rounded-full px-4 py-1.5 text-sm font-semibold backdrop-blur"></button>
@@ -269,9 +360,99 @@
     </div>
   </div>
 
-  <!-- ỦNG HỘ / HỒ SƠ -->
+  <!-- BẠN BÈ -->
+  <div id="view-friends" class="view hidden absolute inset-0 overflow-y-auto">
+    <div class="max-w-[600px] mx-auto px-5 py-8">
+      <div class="text-center">
+        <h2 class="text-[28px] font-semibold">Bạn bè của bạn</h2>
+        <p class="text-zinc-500 mt-1 flex items-center justify-center gap-2"><span id="friendCount">...</span><button onclick="loadFriends(true)" class="hover:text-white" title="Tải lại"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg></button></p>
+      </div>
+      <div class="mt-6 relative">
+        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
+        <input id="addFriendInput" placeholder="Thêm một người bạn mới" onkeydown="if(event.key==='Enter')addFriend()" class="w-full bg-white/5 rounded-full pl-12 pr-4 py-3.5 text-[15px] outline-none placeholder-zinc-500">
+      </div>
+      <p class="text-xs text-zinc-500 mt-2 px-4">Nhập tên người dùng rồi bấm Enter để gửi lời mời.</p>
+      <h3 class="mt-8 font-semibold text-[17px]">Tìm bạn bè từ ứng dụng khác</h3>
+      <div class="grid grid-cols-4 gap-3 mt-4 text-center">
+        <button onclick="shareTo('messenger')" class="flex flex-col items-center gap-2 text-[13px] text-zinc-400 hover:text-white"><span class="w-14 h-14 rounded-full bg-zinc-700/70 flex items-center justify-center text-[#0a68ff] font-extrabold"><svg width="28" height="28" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#0a7cff"/><path d="m5.5 14.5 4-5 3 2.8 3.5-2.8-4 5-3-2.8z" fill="#fff"/></svg></span>Messenger</button><button onclick="shareTo('zalo')" class="flex flex-col items-center gap-2 text-[13px] text-zinc-400 hover:text-white"><span class="w-14 h-14 rounded-full bg-zinc-700/70 flex items-center justify-center text-[#0a68ff] font-extrabold">Zalo</span>Zalo</button><button onclick="shareTo('insta')" class="flex flex-col items-center gap-2 text-[13px] text-zinc-400 hover:text-white"><span class="w-14 h-14 rounded-full flex items-center justify-center" style="background:linear-gradient(45deg,#feda75,#d62976,#4f5bd5)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".8" fill="#fff"/></svg></span>Insta</button><button onclick="shareTo('other')" class="flex flex-col items-center gap-2 text-[13px] text-zinc-400 hover:text-white"><span class="w-14 h-14 rounded-full bg-zinc-700/70 flex items-center justify-center text-[#0a68ff] font-extrabold"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="m8.2 10.8 7.6-3.6M8.2 13.2l7.6 3.6"/></svg></span>Khác</button>
+      </div>
+      <div id="reqBox" class="mt-8"></div>
+      <h3 class="mt-8 mb-1 font-semibold text-[17px]">Bạn bè</h3>
+      <p id="friendsStatus" class="text-sm text-zinc-400"></p>
+      <div id="friendsList"></div>
+      <button id="friendMore" onclick="friendShow+=10;renderFriends()" class="hidden mx-auto mt-4 items-center gap-1 bg-white/5 hover:bg-white/10 rounded-full px-5 py-2.5 text-sm font-medium text-zinc-300">Xem thêm <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="m6 9 6 6 6-6"/></svg></button>
+    </div>
+  </div>
+
+  <!-- TẤT CẢ ẢNH -->
+  <div id="view-all" class="view hidden absolute inset-0">
+    <div id="allScroll" class="absolute inset-0 overflow-y-auto">
+      <div class="max-w-[800px] mx-auto px-4 pt-6 pb-10">
+        <p id="allStatus" class="text-sm text-zinc-400 text-center"></p>
+        <div id="allGrid" class="grid grid-cols-3 gap-2"></div>
+        <div id="allSentinel" class="h-10"></div>
+      </div>
+    </div>
+    <div class="absolute top-4 right-5 z-20 flex items-center gap-2">
+      <button onclick="loadAll(true)" class="w-9 h-9 rounded-full bg-[#3b3224]/80 text-zinc-300 hover:text-white flex items-center justify-center" title="Tải lại"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg></button>
+      <div class="relative">
+        <button id="allFilterBtn" onclick="toggleAllMenu()" class="bg-[#3b3224] text-[13px] font-medium rounded-full pl-4 pr-3 py-2 flex items-center gap-2 max-w-[14rem]"><span id="allFilterLabel" class="truncate">Tất cả bạn bè</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div id="allMenu" class="hidden absolute right-0 top-full mt-2 w-72 max-h-[60vh] overflow-y-auto rounded-2xl bg-[#3a3a3c]/95 backdrop-blur shadow-2xl divide-y divide-white/10"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIN NHẮN -->
+  <div id="view-chat" class="view hidden absolute inset-0 px-6 py-5 gap-5">
+    <div class="w-[22rem] shrink-0 flex flex-col min-h-0">
+      <div class="flex items-center justify-between mb-3 px-1">
+        <h2 class="text-[26px] font-semibold">Tin nhắn</h2>
+        <button onclick="openNewChat()" class="w-11 h-11 rounded-full bg-yellow-400 text-black flex items-center justify-center hover:scale-105 transition" title="Tin nhắn mới"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M12 5v14M5 12h14"/></svg></button>
+      </div>
+      <div id="convList" class="flex-1 overflow-y-auto space-y-1"></div>
+    </div>
+    <div class="flex-1 min-w-0 flex flex-col rounded-3xl bg-black/30 border border-white/5 overflow-hidden">
+      <div id="chatHead" class="hidden items-center gap-3 px-4 py-3 border-b border-white/5">
+        <button onclick="closeChatUI()" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0" title="Quay lại"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="m15 6-6 6 6 6"/></svg></button>
+        <span id="chatAvatar" class="shrink-0"></span>
+        <span id="chatTitle" class="font-semibold text-[17px] truncate flex-1"></span>
+        <label class="text-xs text-zinc-400 flex items-center gap-1 shrink-0"><input id="ghost" type="checkbox"> Ẩn trạng thái đã xem</label>
+      </div>
+      <div id="chatEmpty" class="flex-1 flex items-center justify-center text-sm text-zinc-500">Chọn một cuộc trò chuyện</div>
+      <div id="msgList" class="hidden flex-1 overflow-y-auto p-5 space-y-2"></div>
+      <div id="chatInput" class="hidden items-center gap-3 p-3 border-t border-white/5">
+        <button onclick="openAttach()" class="w-11 h-11 rounded-full text-yellow-400 hover:bg-white/10 flex items-center justify-center shrink-0" title="Gửi khoảnh khắc của bạn"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><rect x="3.5" y="3.5" width="17" height="17" rx="3.5"/><circle cx="9" cy="9.5" r="1.6"/><path d="m4 17 5-5 4 4 3-3 4 4"/></svg></button>
+        <input id="msgInput" maxlength="500" placeholder="Gửi tin nhắn..." oninput="msgInputChange()" onkeydown="if(event.key==='Enter')sendMsg()" class="flex-1 min-w-0 bg-white/5 rounded-full px-5 py-3 text-[15px] outline-none placeholder-zinc-500">
+        <button id="sendMsgBtn" onclick="sendMsg()" class="w-12 h-12 rounded-full bg-[#6b5320] text-black/60 flex items-center justify-center shrink-0 transition"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M12 19V5"/><path d="m6 11 6-6 6 6"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ỦNG HỘ / HỒ SƠ / THIỆP -->
   <div id="view-donate" class="view hidden absolute inset-0 overflow-y-auto p-6"><div id="donateBody" class="max-w-md mx-auto"></div></div>
   <div id="view-profile" class="view hidden absolute inset-0 overflow-y-auto p-6"><div id="profileBody" class="max-w-xl mx-auto"></div></div>
+  <div id="view-card" class="view hidden absolute inset-0 overflow-y-auto p-6"><div id="cardBody" class="max-w-md mx-auto"></div></div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="mobile-nav hidden">
+    <button onclick="showView('upload');setMobileNav('upload')" data-nav="upload" class="active">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        <span>Đăng ảnh</span>
+    </button>
+    <button onclick="showView('feed');setMobileNav('feed')" data-nav="feed">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10"/></svg>
+        <span>Khoảnh khắc</span>
+    </button>
+    <button onclick="showView('chat');setMobileNav('chat')" data-nav="chat" class="relative">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Tin nhắn</span>
+        <span id="chatBadgeMobile" class="absolute top-0 right-1/4 bg-yellow-400 text-black text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
+    </button>
+    <button onclick="showView('profile');setMobileNav('profile')" data-nav="profile">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Hồ sơ</span>
+    </button>
 </div>
 
 <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-sm hidden z-[200]"></div>
@@ -279,26 +460,6 @@
 <script>
 /* ============ Tiện ích ============ */
 const $ = id => document.getElementById(id);
-// Thẻ video có tự sửa lỗi: trực tiếp -> qua máy chủ -> đổi sang H.264 -> báo lỗi rõ ràng
-const videoTag = (url, poster, cls, attrs) => `<video src="${esc(url)}" data-src="${esc(url)}" poster="${esc(poster)}" ${attrs} class="${cls}" onerror="videoFail(this)"></video>`;
-function videoFail(v) {
-  const orig = v.dataset.src, stage = +(v.dataset.stage || 0), code = v.error ? v.error.code : 0;
-  // code 4 = định dạng/codec không hỗ trợ (thường là HEVC) -> đổi định dạng luôn; lỗi khác -> thử qua máy chủ trước
-  const next = stage === 0 ? (code === 4 ? 2 : 1) : stage === 1 ? 2 : 3;
-  if (orig && next < 3) {
-    v.dataset.stage = next;
-    if (next === 2 && !v.dataset.warned) { v.dataset.warned = '1'; toast('Đang chuyển định dạng video để phát...', 6000); }
-    v.src = '/api/media?u=' + encodeURIComponent(orig) + (next === 2 ? '&t=1' : '');
-    v.load(); safePlay(v); return;
-  }
-  const poster = v.getAttribute('poster') || '', box = document.createElement('div');
-  box.className = v.className.replace(/object-(contain|cover)/g, '') + ' relative overflow-hidden';
-  box.innerHTML = `${poster ? `<img src="${esc(poster)}" class="w-full h-full object-cover opacity-50" alt="">` : ''}
-    <div class="absolute inset-0 flex flex-col items-center justify-center gap-2 p-4 text-center text-xs text-zinc-200">
-    <span>Không phát được video này trên trình duyệt của bạn.</span>
-    <a href="${esc(orig)}" target="_blank" rel="noopener" class="bg-white/15 hover:bg-white/25 rounded-full px-4 py-1.5 font-semibold">Mở / tải video</a></div>`;
-  v.replaceWith(box);
-}
 const safePlay = v => { try { const r = v.play(); if (r && r.catch) r.catch(() => {}); } catch {} };
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const safeUrl = u => /^https?:\/\//i.test(u || '') ? u : '';
@@ -308,7 +469,18 @@ function show(el, disp = 'flex') { el.classList.remove('hidden'); if (disp) el.c
 function hide(el, disp = 'flex') { el.classList.add('hidden'); if (disp) el.classList.remove(disp); }
 
 /* ============ Đăng nhập / API ============ */
-const creds = () => { try { return JSON.parse(sessionStorage.getItem('locket_creds') || 'null'); } catch { return null; } };
+const creds = () => { 
+  try { 
+    const d = localStorage.getItem('locket_user_data'); 
+    if (!d) return null;
+    const parsed = JSON.parse(d);
+    if (parsed.expire && Date.now() > parsed.expire) {
+      localStorage.removeItem('locket_user_data');
+      return null;
+    }
+    return parsed.data; 
+  } catch { return null; } 
+};
 const showLogin = () => show($('loginModal'));
 const hideLogin = () => hide($('loginModal'));
 
@@ -332,32 +504,56 @@ async function loginWith(email, password, save) {
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.detail || 'Đăng nhập thất bại');
   const name = data.name || data.username || email;
-  sessionStorage.setItem('locket_creds', JSON.stringify({ email, password }));
-  sessionStorage.setItem('locket_name', name); sessionStorage.setItem('locket_user', data.username || '');
-  if (save) saveAccount(email, password, name);
-  resetData(); renderUser(); hideLogin(); loadLastThumb();
+  
+  if (save) {
+    localStorage.setItem('locket_user_data', JSON.stringify({
+      data: { email, password },
+      expire: Date.now() + (30 * 24 * 60 * 60 * 1000)
+    }));
+  } else {
+    sessionStorage.setItem('locket_creds', JSON.stringify({ email, password }));
+  }
+  
+  sessionStorage.setItem('locket_name', name); 
+  sessionStorage.setItem('locket_user', data.username || '');
+  
+  resetData(); 
+  renderUser(); 
+  hideLogin(); 
+  loadLastThumb();
 }
+
 async function doLogin() {
   const email = $('loginEmail').value.trim(), password = $('loginPass').value, err = $('loginError');
   if (!email || !password) { err.textContent = 'Nhập đủ email và mật khẩu.'; return; }
   $('loginBtn').disabled = true; err.textContent = 'Đang đăng nhập...';
-  try { await loginWith(email, password, $('saveAcc').checked); $('loginPass').value = ''; err.textContent = ''; showView('upload'); }
-  catch (e) { err.textContent = e.message; } finally { $('loginBtn').disabled = false; }
+  try { 
+    await loginWith(email, password, true);
+    $('loginPass').value = ''; 
+    err.textContent = ''; 
+    showView('upload'); 
+  }
+  catch (e) { err.textContent = e.message; } 
+  finally { $('loginBtn').disabled = false; }
 }
-// Xóa dữ liệu của tài khoản cũ khi đổi/đăng xuất
+
 function resetData() {
-  if (manual.active) setManual(false);
-  friends = null; feedPosts = []; feedView = []; feedIdx = 0; feedCache = {}; feedMeta = {}; feedUser = ''; profileData = null;
-  $('feedFilterLabel').textContent = 'Tất cả bạn bè'; $('feedScroll').innerHTML = '';
-  sessionStorage.removeItem('locket_friends'); closeSend(true); setLastThumb('');
+  friends = null; convs = null; curConv = null; allItems = []; feedPosts = []; feedView = []; feedIdx = 0; feedCache = {}; feedUser = ''; $('feedFilterLabel').textContent = 'Tất cả bạn bè';
+  sessionStorage.removeItem('locket_friends');
+  ['friendsList', 'allGrid', 'convList', 'msgList'].forEach(id => $(id).innerHTML = '');
+  closeChatUI(); allCache = {}; allUser = ''; allNext = null; friendReqs = null; myMoments = null; profileData = null; $('reqBox').innerHTML = ''; $('allFilterLabel').textContent = 'Tất cả bạn bè';
+  $('chatBadge').classList.add('hidden'); 
+  if ($('chatBadgeMobile')) $('chatBadgeMobile').classList.add('hidden');
+  closeSend(true); setLastThumb('');
 }
 function logout() {
-  ['locket_creds', 'locket_name'].forEach(k => sessionStorage.removeItem(k));
+  localStorage.removeItem('locket_user_data');
+  sessionStorage.removeItem('locket_creds');
+  sessionStorage.removeItem('locket_name');
   resetData(); renderUser(); showLogin();
 }
 const renderUser = () => $('userInfo').textContent = sessionStorage.getItem('locket_name') || '';
 
-/* ---- Tài khoản đã lưu ---- */
 const SAVED = 'locket_saved_accounts';
 const savedList = () => { try { return JSON.parse(localStorage.getItem(SAVED) || '[]'); } catch { return []; } };
 const setSaved = l => { try { localStorage.setItem(SAVED, JSON.stringify(l.slice(0, 8))); } catch {} };
@@ -367,7 +563,7 @@ function openAccounts() {
   $('accList').innerHTML = l.length ? l.map((a, i) => `<div class="flex items-center gap-2 bg-zinc-900 rounded-xl p-2">
       <button onclick="switchAccount(${i})" class="flex-1 text-left min-w-0"><div class="text-sm font-medium truncate">${esc(a.name || a.email)} ${a.email === cur ? '<span class="text-yellow-400 text-xs">(đang dùng)</span>' : ''}</div><div class="text-xs text-zinc-400 truncate">${esc(a.email)}</div></button>
       <button onclick="removeAccount(${i})" class="w-7 h-7 rounded-full bg-zinc-700 text-xs" title="Xóa khỏi máy">✕</button></div>`).join('')
-    : '<p class="text-xs text-zinc-400">Chưa có tài khoản nào được lưu. Tick "Lưu tài khoản" khi đăng nhập.</p>';
+    : '<p class="text-xs text-zinc-400">Chưa có tài khoản nào được lưu.</p>';
   show($('accModal'));
 }
 const closeAccounts = () => hide($('accModal'));
@@ -385,17 +581,29 @@ $('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin
 function showView(name) {
   document.querySelectorAll('.view').forEach(v => { v.classList.add('hidden'); v.classList.remove('flex'); });
   const t = $('view-' + name); t.classList.remove('hidden');
-  if (name === 'upload') t.classList.add('flex');
+  if (name === 'upload' || name === 'chat') t.classList.add('flex');
   document.querySelectorAll('.nav-item').forEach(a => {
     a.className = 'nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-[13px] font-medium ' + (a.dataset.view === name ? 'bg-[#3b3224] text-[#f5c542]' : 'text-zinc-400 hover:bg-white/5 hover:text-white');
   });
+  setMobileNav(name);
+  
   if (name === 'feed') loadFeed();
+  if (name === 'friends') loadFriends();
+  if (name === 'all') loadAll();
+  if (name === 'chat') loadConvs();
   if (name === 'profile') loadProfile();
   if (name === 'donate') renderDonate();
+  if (name === 'card') renderCard();
   applySettings();
 }
 
-/* ============ Bạn bè (có cache) ============ */
+function setMobileNav(name) {
+  document.querySelectorAll('.mobile-nav button').forEach(b => {
+    b.classList.toggle('active', b.dataset.nav === name);
+  });
+}
+
+/* ============ Bạn bè ============ */
 let friends = null;
 async function getFriends(force = false) {
   if (!force) {
@@ -414,316 +622,123 @@ const avatarHtml = (f, cls) => {
            : `<div class="${cls} rounded-full bg-zinc-600 flex items-center justify-center font-bold">${esc(fName(f).charAt(0).toUpperCase())}</div>`;
 };
 
+const X_ICON = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M18 6 6 18M6 6l12 12"/></svg>`, PLAY_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>`;
+let friendShow = 8, friendReqs = null, sheetUid = '';
 const inviteLink = () => 'https://locket.cam/' + (sessionStorage.getItem('locket_user') || '');
+async function loadFriends(force = false) {
+  const st = $('friendsStatus'); if (force || !friends) st.textContent = 'Đang tải...';
+  try { await getFriends(force); renderFriends(); loadRequests(); }
+  catch (e) { st.textContent = '❌ ' + e.message; }
+}
+function renderFriends() {
+  const fr = (friends || []).slice().sort((a, b) => fName(a).localeCompare(fName(b), 'vi'));
+  $('friendCount').textContent = fr.length + ' bạn bè';
+  $('friendsStatus').textContent = fr.length ? '' : 'Bạn chưa có bạn bè nào.';
+  $('friendsList').innerHTML = fr.slice(0, friendShow).map(f => `<div onclick="openFriendSheet('${esc(f.uid)}')" class="flex items-center gap-4 py-3 cursor-pointer">
+    <div class="w-14 h-14 rounded-full border-2 border-[#b8892a] p-0.5 shrink-0">${avatarHtml(f, 'w-full h-full')}</div>
+    <span class="flex-1 truncate text-[17px] font-semibold">${esc(fName(f))}</span>
+    <span class="w-11 h-11 rounded-full bg-white/10 text-zinc-300 flex items-center justify-center shrink-0">${X_ICON}</span></div>`).join('');
+  $('friendMore').classList.toggle('hidden', fr.length <= friendShow);
+}
+async function loadRequests() {
+  try { friendReqs = await api('/api/friend_requests'); } catch { friendReqs = null; }
+  const box = $('reqBox'), inc = (friendReqs && friendReqs.incoming) || [], out = (friendReqs && friendReqs.outgoing) || [];
+  if (!inc.length && !out.length) { box.innerHTML = ''; return; }
+  const row = (f, btns) => `<div class="flex items-center gap-3 py-2">${avatarHtml(f, 'w-11 h-11')}<div class="min-w-0 flex-1"><div class="text-[15px] font-semibold truncate">${esc(fName(f))}</div><div class="text-xs text-zinc-500 truncate">${f.username ? '@' + esc(f.username) : ''}</div></div>${btns}</div>`;
+  box.innerHTML = (inc.length ? `<h3 class="font-semibold text-[17px] mb-1">Lời mời kết bạn (${inc.length})</h3>` + inc.map(f => row(f,
+      `<button onclick="reqAct('accept','${esc(f.uid)}')" class="bg-yellow-400 text-black text-sm font-semibold rounded-full px-4 py-1.5">Chấp nhận</button><button onclick="reqAct('remove','${esc(f.uid)}')" class="bg-white/10 text-sm rounded-full px-4 py-1.5">Từ chối</button>`)).join('') : '')
+    + (out.length ? `<h3 class="font-semibold text-[17px] mt-5 mb-1">Đã gửi lời mời (${out.length})</h3>` + out.map(f => row(f,
+      `<button onclick="reqAct('remove','${esc(f.uid)}')" class="bg-white/10 text-sm rounded-full px-4 py-1.5">Hủy</button>`)).join('') : '');
+}
+async function reqAct(kind, uid) {
+  try {
+    await api(kind === 'accept' ? '/api/friend_accept' : '/api/friend_remove', { uid });
+    toast(kind === 'accept' ? '✅ Đã chấp nhận' : 'Đã xong');
+    if (kind === 'accept') { await getFriends(true); renderFriends(); }
+    loadRequests();
+  } catch (e) { toast('❌ ' + e.message, 4000); }
+}
+async function addFriend() {
+  const inp = $('addFriendInput'), u = inp.value.trim().replace(/^@/, ''); if (!u) return;
+  inp.disabled = true;
+  try { await api('/api/friend_add', { username: u }); toast('✅ Đã gửi lời mời tới @' + u); inp.value = ''; loadRequests(); }
+  catch (e) { toast('❌ ' + e.message, 5000); } finally { inp.disabled = false; inp.focus(); }
+}
+function shareTo(kind) {
+  const link = inviteLink(), go = u => window.open(u, '_blank', 'noopener');
+  if (kind === 'other' && navigator.share) { navigator.share({ title: 'Locket', text: 'Kết bạn với mình trên Locket nhé!', url: link }).catch(() => {}); return; }
+  copyText(link);
+  const to = { messenger: 'https://www.messenger.com/', zalo: 'https://chat.zalo.me/', insta: 'https://www.instagram.com/direct/inbox/' }[kind];
+  if (to) { toast('Đã chép link mời, hãy dán vào cuộc trò chuyện', 4000); go(to); }
+}
+function openFriendSheet(uid) {
+  const f = (friends || []).find(x => x.uid === uid); if (!f) return;
+  sheetUid = uid; $('fsName').textContent = fName(f); $('fsUser').textContent = f.username ? '@' + f.username : ''; show($('friendSheet'));
+}
+const closeFriendSheet = () => hide($('friendSheet'));
+function fsChat() { closeFriendSheet(); openChatWith(sheetUid); }
+function dropFriend(uid) {
+  friends = (friends || []).filter(f => f.uid !== uid);
+  try { sessionStorage.setItem('locket_friends', JSON.stringify(friends)); } catch {}
+  feedCache = {}; allCache = {}; renderFriends();
+}
+async function fsAct(kind) {
+  const f = (friends || []).find(x => x.uid === sheetUid); if (!f) return;
+  const msg = kind === 'block' ? `Chặn ${fName(f)}? Họ cũng sẽ bị xoá khỏi danh sách bạn bè.` : `Xoá ${fName(f)} khỏi danh sách bạn bè?`;
+  if (!confirm(msg)) return;
+  closeFriendSheet();
+  try { await api(kind === 'block' ? '/api/friend_block' : '/api/friend_remove', { uid: sheetUid }); dropFriend(sheetUid); toast(kind === 'block' ? 'Đã chặn' : 'Đã xoá bạn'); }
+  catch (e) { toast('❌ ' + e.message, 4000); }
+}
+const fsRemove = () => fsAct('remove'), fsBlock = () => fsAct('block');
 
-/* ============ Photobooth: cài đặt ============ */
-const mkCanvas = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+/* ============ Photobooth ============ */
+const COLORS = ['#ffffff', '#111111', '#ffd1dc', '#f5e9d7', '#cfe4ff', '#d4f3e3'];
+const PATTERNS = [
+    { name: 'Hoàng hôn', cls: 'pb-sunset' },
+    { name: 'Bầu trời', cls: 'pb-sky' },
+    { name: 'Halloween', cls: 'pb-halloween' },
+    { name: 'Giáng sinh', cls: 'pb-christmas' },
+    { name: 'Valentine', cls: 'pb-valentine' },
+    { name: 'Sinh nhật', cls: 'pb-birthday' },
+    { name: 'Chấm bi', cls: 'pb-pattern', style: 'background-image: radial-gradient(#fff 20%, transparent 20%); background-size: 10px 10px; background-color:#ff9a9e' }
+];
 const LAYOUTS = [['grid', 'Lưới 2×2'], ['strip', 'Dải đôi'], ['feat', 'Nổi bật']];
-const NEXT_DELAY = 2; // giây đếm ngược cho các ảnh sau ảnh đầu (đoán từ video)
+const NEXT_DELAY = 3; 
+let pb = { on: false, timer: 3, layout: 'grid', color: '#ffffff', bgClass: '' };
+let draft = { ...pb };
+
+const cellHtml = '<div class="bg-zinc-300 rounded-[2px]"></div>';
+const miniLayout = {
+  grid: `<div class="grid grid-cols-2 gap-1 h-full">${cellHtml.repeat(4)}</div>`,
+  strip: `<div class="grid grid-cols-2 gap-1.5 h-full">${[0, 1].map(() => `<div class="grid grid-rows-4 gap-0.5">${cellHtml.repeat(4)}</div>`).join('')}</div>`,
+  feat: `<div class="flex flex-col gap-1 h-full"><div class="bg-zinc-300 rounded-[2px] flex-[2]"></div><div class="grid grid-cols-3 gap-1 flex-1">${cellHtml.repeat(3)}</div></div>`
+};
 const PB_SVG = (size = 20) => `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2.6"/><rect x="9.5" y="5.8" width="5" height="3.2" rx=".7" fill="currentColor" stroke="none"/><rect x="9.5" y="10.4" width="5" height="3.2" rx=".7" fill="currentColor" stroke="none"/><rect x="9.5" y="15" width="5" height="3.2" rx=".7" fill="currentColor" stroke="none"/></svg>`;
 
-/* ===== Photobooth nâng cấp: khung nền, hoạ tiết, khung theo mùa, chữ & phông ===== */
-const BOOTH_COLORS = ['#ffffff', '#111111', '#ffd1dc', '#f5e9d7', '#cfe4ff', '#d4f3e3'];
-const BOOTH_PATTERNS = [['dots', 'Chấm bi'], ['gingham', 'Caro'], ['stripes', 'Kẻ sọc'], ['glitter', 'Kim tuyến'], ['kraft', 'Giấy kraft']];
-const BOOTH_GRADIENTS = [['sunset', 'Hoàng hôn'], ['sky', 'Bầu trời']];
-const BOOTH_SEASONS = [['halloween', 'Halloween'], ['xmas', 'Giáng sinh'], ['tet', 'Tết'], ['valentine', 'Valentine'], ['birthday', 'Sinh nhật']];
-const BOOTH_STYLES = [['orig', 'Gốc'], ['bw', 'Đen trắng'], ['digicam', 'Digicam'], ['film', 'Phim'], ['dream', 'Mộng mơ']];
-const BOOTH_FONTS = {
-  modern: ['Hiện đại', '700 {s}px Inter, system-ui, sans-serif', 1],
-  classic: ['Cổ điển', 'italic 700 {s}px "Playfair Display", Georgia, serif', 1.05],
-  script: ['Viết tay', '700 {s}px "Dancing Script", "Brush Script MT", cursive', 1.3],
-  typewriter: ['Máy chữ', '700 {s}px "Courier Prime", "Courier New", monospace', .92]
-};
-const BOOTH_SUGGEST = ['Best friends', 'Hôm nay vui ghê', 'Squad', 'Love you'];
-const BOOTH_TEXT = { dots: '#d6336c', gingham: '#3b5bdb', stripes: '#7a5a2b', glitter: '#ffd86b', kraft: '#4b2e15', sunset: '#ffffff', sky: '#2b4a7a', halloween: '#ff9a3c', xmas: '#ffffff', tet: '#ffd23a', valentine: '#d6336c', birthday: '#7a3e12' };
-const BOOTH_STICKERS = { halloween: ['🕸️', '🦇', '🎃', '👻'], xmas: ['❄️', '⭐', '🎄', '🎁'], tet: ['🏮', '🏮', '🧧', '🌸'], valentine: ['💘', '💗', '💖', '💌'], birthday: ['🎁', '🎉', '🎂', '🎈'] };
-
-function bRng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
-function bRR(x, px, py, w, h, r) {   // hình chữ nhật bo góc
-  r = Math.min(r, w / 2, h / 2); x.beginPath(); x.moveTo(px + r, py); x.arcTo(px + w, py, px + w, py + h, r); x.arcTo(px + w, py + h, px, py + h, r); x.arcTo(px, py + h, px, py, r); x.arcTo(px, py, px + w, py, r); x.closePath();
+function pbTab(t) {
+  $('pbt-auto').className = t === 'auto' ? 'flex-1 py-2 bg-zinc-700 text-white rounded-lg font-medium text-sm' : 'flex-1 py-2 text-zinc-400 font-medium text-sm';
+  $('pbt-single').className = t === 'single' ? 'flex-1 py-2 bg-zinc-700 text-white rounded-lg font-medium text-sm' : 'flex-1 py-2 text-zinc-400 font-medium text-sm';
 }
-function bCover(x, src, px, py, w, h) {
-  const s = Math.max(w / src.width, h / src.height), dw = src.width * s, dh = src.height * s;
-  x.drawImage(src, px + (w - dw) / 2, py + (h - dh) / 2, dw, dh);
-}
-function bStar(x, cx, cy, r) { x.beginPath(); for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4 - Math.PI / 2, rr = i % 2 ? r * .25 : r; x.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr); } x.closePath(); x.fill(); }
-function bHeart(x, cx, cy, s) { x.beginPath(); x.moveTo(cx, cy + s * .9); x.bezierCurveTo(cx - s * 1.5, cy - s * .2, cx - s * .8, cy - s * 1.2, cx, cy - s * .4); x.bezierCurveTo(cx + s * .8, cy - s * 1.2, cx + s * 1.5, cy - s * .2, cx, cy + s * .9); x.closePath(); x.fill(); }
-function bBat(x, cx, cy, s) {
-  x.beginPath(); x.moveTo(cx, cy); x.quadraticCurveTo(cx - s * .5, cy - s * .7, cx - s * 1.2, cy - s * .2); x.quadraticCurveTo(cx - s * .8, cy + s * .05, cx - s * .6, cy + s * .35);
-  x.quadraticCurveTo(cx - s * .3, cy + s * .05, cx, cy + s * .3); x.quadraticCurveTo(cx + s * .3, cy + s * .05, cx + s * .6, cy + s * .35); x.quadraticCurveTo(cx + s * .8, cy + s * .05, cx + s * 1.2, cy - s * .2);
-  x.quadraticCurveTo(cx + s * .5, cy - s * .7, cx, cy); x.fill();
-}
-function bFlower(x, cx, cy, r, col) {
-  x.fillStyle = col; for (let k = 0; k < 5; k++) { const a = k * Math.PI * 2 / 5; x.beginPath(); x.arc(cx + Math.cos(a) * r * .55, cy + Math.sin(a) * r * .55, r * .5, 0, 7); x.fill(); }
-  x.fillStyle = '#fff3a8'; x.beginPath(); x.arc(cx, cy, r * .28, 0, 7); x.fill();
-}
-function bFlake(x, cx, cy, r) { x.lineWidth = Math.max(1, r * .16); x.beginPath(); for (let k = 0; k < 3; k++) { const a = k * Math.PI / 3; x.moveTo(cx - Math.cos(a) * r, cy - Math.sin(a) * r); x.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); } x.stroke(); }
-
-const BOOTH_PAINT = {
-  dots(x, W, H) { x.fillStyle = '#ffd3e4'; x.fillRect(0, 0, W, H); x.fillStyle = 'rgba(255,255,255,.92)'; const s = W * .04; for (let j = 0, y = 0; y < H + s; y += s, j++) for (let xx = (j % 2) * s / 2; xx < W + s; xx += s) { x.beginPath(); x.arc(xx, y, W * .0115, 0, 7); x.fill(); } },
-  gingham(x, W, H) { x.fillStyle = '#f4f7ff'; x.fillRect(0, 0, W, H); x.fillStyle = 'rgba(110,150,255,.4)'; const b = W / 15; for (let i = 0; i < 15; i += 2) { x.fillRect(i * b, 0, b, H); x.fillRect(0, i * b, W, b); } },
-  stripes(x, W, H) { x.fillStyle = '#f7ead0'; x.fillRect(0, 0, W, H); x.save(); x.translate(W / 2, H / 2); x.rotate(-Math.PI / 4); x.strokeStyle = 'rgba(224,198,150,.9)'; x.lineWidth = W * .022; for (let i = -W; i < W; i += W * .055) { x.beginPath(); x.moveTo(i, -W); x.lineTo(i, W); x.stroke(); } x.restore(); },
-  glitter(x, W, H) {
-    x.fillStyle = '#0d0d11'; x.fillRect(0, 0, W, H); const r = bRng(5), cols = ['#ffd86b', '#ffffff', '#9fd3ff', '#ffb6d9'];
-    for (let i = 0; i < 330; i++) { x.fillStyle = cols[i % 4]; x.globalAlpha = .35 + r() * .6; x.beginPath(); x.arc(r() * W, r() * H, W * (.0012 + r() * .0022), 0, 7); x.fill(); }
-    for (let i = 0; i < 90; i++) { x.fillStyle = cols[i % 4]; x.globalAlpha = .55 + r() * .45; bStar(x, r() * W, r() * H, W * (.006 + r() * .012)); } x.globalAlpha = 1;
-  },
-  kraft(x, W, H) {
-    x.fillStyle = '#b98d5e'; x.fillRect(0, 0, W, H); const r = bRng(9);
-    for (let i = 0; i < 3200; i++) { x.fillStyle = r() < .5 ? 'rgba(60,35,10,.10)' : 'rgba(255,235,200,.11)'; x.fillRect(r() * W, r() * H, 1 + r() * 4, 1 + r() * 2); }
-    x.strokeStyle = 'rgba(80,50,20,.06)'; x.lineWidth = 1; for (let i = 0; i < 160; i++) { const px = r() * W, py = r() * H; x.beginPath(); x.moveTo(px, py); x.lineTo(px + (r() - .5) * 90, py + (r() - .5) * 30); x.stroke(); }
-  },
-  sunset(x, W, H) { const g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#ff5f8d'); g.addColorStop(.55, '#ff9a8a'); g.addColorStop(1, '#ffd29a'); x.fillStyle = g; x.fillRect(0, 0, W, H); },
-  sky(x, W, H) { const g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#7db8ff'); g.addColorStop(1, '#e8f3ff'); x.fillStyle = g; x.fillRect(0, 0, W, H); },
-  halloween(x, W, H) {
-    const g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#3a2178'); g.addColorStop(.45, '#1c0f36'); g.addColorStop(1, '#3b1634'); x.fillStyle = g; x.fillRect(0, 0, W, H);
-    const r = bRng(31); x.fillStyle = '#fff'; for (let i = 0; i < 110; i++) { x.globalAlpha = .25 + r() * .6; x.beginPath(); x.arc(r() * W, r() * H, W * (.0009 + r() * .0016), 0, 7); x.fill(); }
-    x.fillStyle = '#ffe9a8'; for (let i = 0; i < 14; i++) { x.globalAlpha = .6 + r() * .4; bStar(x, r() * W, r() * H, W * (.004 + r() * .005)); } x.globalAlpha = 1;
-    const mg = x.createRadialGradient(W * .69, W * .025, 0, W * .69, W * .025, W * .06); mg.addColorStop(0, 'rgba(255,241,184,.55)'); mg.addColorStop(1, 'rgba(255,241,184,0)'); x.fillStyle = mg; x.fillRect(W * .6, 0, W * .2, W * .12);
-    x.fillStyle = '#fff1b8'; x.beginPath(); x.arc(W * .69, W * .025, W * .016, 0, 7); x.fill();
-    x.fillStyle = 'rgba(14,8,24,.85)'; for (let i = 0; i < 9; i++) bBat(x, r() * W, r() * H, W * (.012 + r() * .01));
-  },
-  xmas(x, W, H) {
-    x.fillStyle = '#b01322'; x.fillRect(0, 0, W, H); const r = bRng(17); x.strokeStyle = 'rgba(255,255,255,.9)'; x.fillStyle = 'rgba(255,255,255,.9)';
-    for (let i = 0; i < 70; i++) { x.globalAlpha = .45 + r() * .55; bFlake(x, r() * W, r() * H, W * (.007 + r() * .008)); }
-    for (let i = 0; i < 90; i++) { x.globalAlpha = .4 + r() * .5; x.beginPath(); x.arc(r() * W, r() * H, W * (.0018 + r() * .002), 0, 7); x.fill(); } x.globalAlpha = 1;
-  },
-  tet(x, W, H) {
-    x.fillStyle = '#c4121f'; x.fillRect(0, 0, W, H); const r = bRng(23);
-    for (let i = 0; i < 50; i++) bFlower(x, r() * W, r() * H, W * (.008 + r() * .006), i % 3 ? '#ffd23a' : '#ff9bb8');
-    x.strokeStyle = '#ffcf40'; x.lineWidth = W * .0045; x.strokeRect(W * .011, W * .011, W * .978, H - W * .022); x.lineWidth = W * .0022; x.strokeRect(W * .02, W * .02, W * .96, H - W * .04);
-  },
-  valentine(x, W, H) {
-    x.fillStyle = '#ffd7e5'; x.fillRect(0, 0, W, H); const r = bRng(41); x.fillStyle = '#ff9ec2';
-    for (let i = 0; i < 110; i++) { x.globalAlpha = .35 + r() * .35; bHeart(x, r() * W, r() * H, W * (.006 + r() * .007)); } x.globalAlpha = 1;
-  },
-  birthday(x, W, H) {
-    x.fillStyle = '#fff0cf'; x.fillRect(0, 0, W, H); const r = bRng(53), cols = ['#ff6b9a', '#ffd23a', '#4ad7ff', '#8e5bff', '#6be36b', '#ff8a3a'];
-    for (let i = 0; i < 190; i++) { x.save(); x.translate(r() * W, r() * H); x.rotate(r() * 6.28); x.fillStyle = cols[i % 6]; x.globalAlpha = .85; if (i % 4 === 0) { x.beginPath(); x.arc(0, 0, W * .0045, 0, 7); x.fill(); } else x.fillRect(-W * .006, -W * .0028, W * .012, W * .0056); x.restore(); }
-    x.globalAlpha = 1;
-  }
-};
-function boothBackground(x, W, H, bg, custom) {
-  if (bg.kind === 'color') { x.fillStyle = bg.v; x.fillRect(0, 0, W, H); return; }
-  if (bg.kind === 'custom') { x.fillStyle = '#ffffff'; x.fillRect(0, 0, W, H); if (custom && !boothHasAlpha(custom)) bCover(x, custom, 0, 0, W, H); return; }
-  const fn = BOOTH_PAINT[bg.v]; if (fn) { x.save(); fn(x, W, H); x.restore(); } else { x.fillStyle = '#fff'; x.fillRect(0, 0, W, H); }
-}
-function boothHasAlpha(img) {   // khung có vùng trong suốt (đặt ảnh vào đó) hay là nền đặc?
-  const c = mkCanvas(40, 40), x = c.getContext('2d'); x.drawImage(img, 0, 0, 40, 40); const d = x.getImageData(0, 0, 40, 40).data; let n = 0;
-  for (let i = 3; i < d.length; i += 4) if (d[i] < 200) n++; return n > 24;
-}
-function boothTextColor(bg) {
-  if (bg.kind === 'color') { const h = bg.v.replace('#', ''), v = [0, 2, 4].map(i => parseInt(h.substr(i, 2), 16)); return (v[0] * .299 + v[1] * .587 + v[2] * .114) < 110 ? '#ffffff' : '#2b2b2b'; }
-  return BOOTH_TEXT[bg.v] || '#ffffff';
-}
-function boothStickers(x, W, H, foot, season) {
-  const em = BOOTH_STICKERS[season]; if (!em) return; const s = W * .07;
-  x.font = `${s}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle';
-  const pos = [[W * .048, W * .05], [W * .952, W * .05], [W * .06, H - Math.max(foot, 70) / 2], [W * .94, H - Math.max(foot, 70) / 2]];
-  em.forEach((e, i) => { x.save(); x.shadowColor = 'rgba(0,0,0,.25)'; x.shadowBlur = W * .008; x.fillText(e, pos[i][0], pos[i][1]); x.restore(); });
-}
-function boothDate() { const d = new Date(), p = n => String(n).padStart(2, '0'); return `${p(d.getDate())}.${p(d.getMonth() + 1)}.${d.getFullYear()}`; }
-function boothLines(cfg) {
-  const m = cfg.textMode, custom = (cfg.text || '').trim().slice(0, 30), date = boothDate();
-  if (m === 'none') return []; if (m === 'custom' && custom) return [custom]; if (m === 'both' && custom) return [custom, date]; return [date];
-}
-function boothFont(fontKey, px) { const f = BOOTH_FONTS[fontKey] || BOOTH_FONTS.modern; return f[1].replace('{s}', Math.round(px * f[2])); }
-function boothText(x, W, H, foot, cfg, color) {
-  const lines = boothLines(cfg); if (!lines.length) return;
-  x.fillStyle = color; x.textAlign = 'center'; x.textBaseline = 'middle';
-  const two = lines.length === 2, cy = H - foot / 2, maxW = W * .62;
-  lines.forEach((t, i) => {
-    let px = foot * (two ? (i ? .22 : .34) : .36); x.font = boothFont(cfg.font, px);
-    while (x.measureText(t).width > maxW && px > 10) { px -= 1.5; x.font = boothFont(cfg.font, px); }
-    x.fillText(t, W / 2, two ? cy + (i ? foot * .2 : -foot * .14) : cy);
-  });
-}
-function boothRects(layout, W, H, g, top, bot) {
-  const R = [];
-  if (layout === 'grid') { const cw = (W - 3 * g) / 2, ch = (bot - top - g) / 2; for (let i = 0; i < 4; i++) R.push({ i, x: g + (i % 2) * (cw + g), y: top + Math.floor(i / 2) * (ch + g), w: cw, h: ch }); }
-  else if (layout === 'strip') { const pw = (W - 3 * g) / 2, ph = (bot - top - 3 * g) / 4; for (let c = 0; c < 2; c++) for (let i = 0; i < 4; i++) R.push({ i, x: g + c * (pw + g), y: top + i * (ph + g), w: pw, h: ph }); }
-  else { const bh = (bot - top - g) * .64, sh = bot - top - g - bh, sw = (W - 4 * g) / 3; R.push({ i: 0, x: g, y: top, w: W - 2 * g, h: bh }); for (let i = 1; i < 4; i++) R.push({ i, x: g + (i - 1) * (sw + g), y: top + bh + g, w: sw, h: sh }); }
-  return R;
-}
-// cfg: { layout, bg:{kind,v}, textMode, text, font }; frames: 4 canvas; custom: ảnh khung người dùng (nếu có)
-const bHoleCache = new WeakMap();
-// Dò các ô trong suốt của khung tự đăng (theo thứ tự đọc: hàng rồi cột) để đặt ảnh vào đúng chỗ
-function boothHoles(img) {
-  if (bHoleCache.has(img)) return bHoleCache.get(img);
-  const N = 160, c = mkCanvas(N, N), x = c.getContext('2d'); x.drawImage(img, 0, 0, N, N);
-  const d = x.getImageData(0, 0, N, N).data, seen = new Uint8Array(N * N), q = new Int32Array(N * N), out = [];
-  for (let s = 0; s < N * N; s++) {
-    if (seen[s] || d[s * 4 + 3] >= 128) continue;
-    let h = 0, t = 0, minx = N, miny = N, maxx = 0, maxy = 0, area = 0; q[t++] = s; seen[s] = 1;
-    while (h < t) {
-      const p = q[h++], px = p % N, py = (p / N) | 0; area++;
-      if (px < minx) minx = px; if (px > maxx) maxx = px; if (py < miny) miny = py; if (py > maxy) maxy = py;
-      [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => { const nx = px + dx, ny = py + dy; if (nx < 0 || ny < 0 || nx >= N || ny >= N) return; const n = ny * N + nx; if (!seen[n] && d[n * 4 + 3] < 128) { seen[n] = 1; q[t++] = n; } });
-    }
-    if (area > N * N * .012) out.push({ x: minx / N, y: miny / N, w: (maxx - minx + 1) / N, h: (maxy - miny + 1) / N });
-  }
-  const real = out.filter(r => !(r.w > .92 && r.h > .92));          // bỏ vùng trong suốt bao quanh mép ngoài
-  const res = (real.length ? real : out).sort((a, b) => Math.abs(a.y - b.y) < .06 ? a.x - b.x : a.y - b.y).slice(0, 12);
-  bHoleCache.set(img, res); return res;
-}
-function composeBooth(frames, cfg, S = 1200, custom = null) {
-  const W = S, H = S, g = S * .03, foot = S * (cfg.textMode === 'none' ? .04 : .085), top = g, bot = H - foot;
-  const cv = mkCanvas(W, H), x = cv.getContext('2d'), bg = cfg.bg, overlay = bg.kind === 'custom' && custom && boothHasAlpha(custom);
-  boothBackground(x, W, H, bg, custom);
-  if (overlay) {   // khung có ô trong suốt: đặt ảnh đúng vào từng ô rồi phủ khung lên trên
-    const holes = boothHoles(custom);
-    if (holes.length) holes.forEach((r, i) => { x.save(); x.beginPath(); x.rect(r.x * W, r.y * H, r.w * W, r.h * H); x.clip(); bCover(x, frames[i % frames.length], r.x * W, r.y * H, r.w * W, r.h * H); x.restore(); });
-    else boothRects(cfg.layout, W, H, g, top, bot).forEach(r => { x.save(); bRR(x, r.x, r.y, r.w, r.h, S * .028); x.clip(); bCover(x, frames[r.i], r.x, r.y, r.w, r.h); x.restore(); });
-    x.drawImage(custom, 0, 0, W, H);
-  } else {
-    boothRects(cfg.layout, W, H, g, top, bot).forEach(r => { x.save(); bRR(x, r.x, r.y, r.w, r.h, Math.min(S * .028, r.h * .12)); x.clip(); bCover(x, frames[r.i], r.x, r.y, r.w, r.h); x.restore(); });
-  }
-  if (bg.kind === 'season') boothStickers(x, W, H, foot, bg.v);
-  boothText(x, W, H, foot, cfg, boothTextColor(bg));
-  return cv;
-}
-
-
-const PB_DEFAULT = { on: false, cap: 'auto', timer: 3, layout: 'grid', style: 'orig', bg: { kind: 'color', v: '#ffffff' }, textMode: 'date', text: '', font: 'modern' };
-let pb = JSON.parse(JSON.stringify(PB_DEFAULT)), draft = null, customFrame = null, pbSample = {}, pbRaf = 0;
-try { const sv = JSON.parse(localStorage.getItem('locket_pb') || 'null'); if (sv && sv.bg && sv.layout) pb = { ...pb, ...sv, on: false }; } catch {}
-try { const du = localStorage.getItem('locket_pb_frame'); if (du) { const im = new Image(); im.onload = () => { const c = mkCanvas(1200, 1200); c.getContext('2d').drawImage(im, 0, 0, 1200, 1200); customFrame = c; }; im.src = du; } } catch {}
-const PB_ICON_CUSTOM = '<span class="block w-16 h-16 rounded-xl border-2 border-dashed border-white/30 flex items-center justify-center text-yellow-400 text-2xl leading-none">+</span>';
-
-// Phong cách ảnh (áp lên từng ảnh trước khi ghép)
-function boothStyle(cv, style) {
-  if (style === 'orig') return; const x = cv.getContext('2d', { willReadFrequently: true }), n = cv.width;
-  if (style === 'bw') colorFilter(x, n, { br: 2, ct: 1.2, sat: 0 });
-  else if (style === 'digicam') { colorFilter(x, n, { br: 8, ct: 1.18, sat: 1.3, r: -6, g: 4, b: 8 }); grain(x, n, 10); }
-  else if (style === 'film') applyFx(cv, x, n, 0, { filter: 'orig', fx: 'film', smooth: 0, bright: 0 });
-  else if (style === 'dream') applyFx(cv, x, n, 0, { filter: 'orig', fx: 'dream', smooth: 0, bright: 0 });
-}
-async function ensureBoothFonts() {
-  if (!document.fonts || !document.fonts.load) return;
-  try { await Promise.all(Object.keys(BOOTH_FONTS).map(k => document.fonts.load(boothFont(k, 40), 'Aa Đẹp'))); } catch {}
-}
-// Ảnh mẫu để xem trước: khung hình camera hiện tại (nếu có)
-function pbBase() {
-  if (pbSample.base) return pbSample.base;
-  const c = mkCanvas(360, 360);
-  if (!process(c, 360, performance.now(), { ...FX0 })) {
-    const x = c.getContext('2d'), g = x.createLinearGradient(0, 0, 360, 360); g.addColorStop(0, '#7b8494'); g.addColorStop(1, '#3b4250'); x.fillStyle = g; x.fillRect(0, 0, 360, 360);
-    x.font = '120px sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.globalAlpha = .55; x.fillText('🙂', 180, 190);
-  }
-  return pbSample.base = c;
-}
-function pbStyled(style, n = 360) {
-  const k = style + n; if (pbSample[k]) return pbSample[k];
-  const c = mkCanvas(n, n); c.getContext('2d').drawImage(pbBase(), 0, 0, n, n); boothStyle(c, style); return pbSample[k] = c;
-}
-const pbFrames = (style, n) => { const f = pbStyled(style, n); return [f, f, f, f]; };
-
-const pbSec = t => `<p class="font-semibold text-[15px] mt-5 mb-2">${t}</p>`;
-const pbSub = t => `<p class="text-xs text-zinc-400 mt-3 mb-2">${t}</p>`;
-const pbCv = (draw, n = 96) => `<canvas data-draw="${draw}" width="${n}" height="${n}" class="w-16 h-16 rounded-xl block"></canvas>`;
-const pbTile = (sel, label, inner) => `<button onclick="pbPick('${sel}')" data-sel="${sel}" class="flex flex-col items-center gap-1.5 w-16 shrink-0"><span class="pbRing block rounded-xl">${inner}</span><span class="pbLab text-[11px] text-zinc-300 text-center leading-tight">${label}</span></button>`;
-const pbSeg = (sel, label, extra = '') => `<button onclick="pbPick('${sel}')" data-sel="${sel}" data-seg="1" class="flex-1 py-2 rounded-lg ${extra}">${label}</button>`;
-
 function renderPb() {
-  pbSample = {};
-  $('pbBody').innerHTML = `
-    <div class="flex justify-center mb-1"><canvas id="pbPreview" width="520" height="520" class="rounded-2xl" style="width:220px;height:220px"></canvas></div>
-    <p id="pbCapHint" class="text-center text-xs text-zinc-400 mb-1"></p>
-    ${pbSec('Chế độ chụp')}<div class="flex bg-zinc-700/60 rounded-xl p-1 text-sm font-semibold text-zinc-300">${pbSeg('cap:auto', 'Tự động')}${pbSeg('cap:manual', 'Tự bấm')}</div>
-    <div id="pbTimerBox">${pbSec('Hẹn giờ ảnh đầu')}<div class="flex bg-zinc-700/60 rounded-xl p-1 text-sm font-semibold text-zinc-300">${[3, 5, 10].map(n => pbSeg('timer:' + n, n + ' giây')).join('')}</div></div>
-    ${pbSec('Kiểu')}<div class="grid grid-cols-3 gap-3">${LAYOUTS.map(([k, n]) => `<button onclick="pbPick('layout:${k}')" data-sel="layout:${k}" class="text-center"><span class="pbRing block rounded-xl overflow-hidden"><canvas data-draw="layout:${k}" width="180" height="180" class="w-full aspect-square block"></canvas></span><span class="pbLab text-xs font-semibold mt-1.5 block text-zinc-300">${n}</span></button>`).join('')}</div>
-    ${pbSec('Phong cách')}<div class="flex gap-3 overflow-x-auto p-1.5 -m-1.5" style="scrollbar-width:none">${BOOTH_STYLES.map(([k, n]) => pbTile('style:' + k, n, pbCv('style:' + k))).join('')}</div>
-    ${pbSec('Khung')}
-    ${pbSub('Khung tự thiết kế')}<div id="pbCustomRow" class="flex gap-3 overflow-x-auto p-1.5 -m-1.5" style="scrollbar-width:none"></div>
-    <p class="text-[11px] text-zinc-500 mt-1.5">Ảnh PNG vuông. Vùng trong suốt là chỗ đặt ảnh chụp (xếp theo kiểu lưới 2×2); khung không có vùng trong suốt sẽ làm nền.</p>
-    ${pbSub('Màu trơn')}<div class="flex gap-3 flex-wrap p-1.5 -m-1.5">${BOOTH_COLORS.map(c => `<button onclick="pbPick('bg:color:${c}')" data-sel="bg:color:${c}" class="pbRing w-11 h-11 rounded-full border border-white/20" style="background:${c}"></button>`).join('')}</div>
-    ${pbSub('Hoạ tiết')}<div class="flex gap-3 flex-wrap p-1.5 -m-1.5">${BOOTH_PATTERNS.map(([k, n]) => pbTile('bg:pattern:' + k, n, pbCv('bg:pattern:' + k))).join('')}${BOOTH_GRADIENTS.map(([k, n]) => pbTile('bg:gradient:' + k, n, pbCv('bg:gradient:' + k))).join('')}</div>
-    ${pbSub('Theo mùa')}<div class="flex gap-3 overflow-x-auto p-1.5 -m-1.5" style="scrollbar-width:none">${BOOTH_SEASONS.map(([k, n]) => pbTile('bg:season:' + k, n, pbCv('bg:season:' + k))).join('')}</div>
-    ${pbSec('Chữ')}<div class="flex bg-zinc-700/60 rounded-xl p-1 text-sm font-semibold text-zinc-300">${[['date', 'Ngày'], ['custom', 'Chữ riêng'], ['both', 'Cả hai'], ['none', 'Không']].map(([k, n]) => pbSeg('mode:' + k, n)).join('')}</div>
-    <div id="pbTextBox" class="mt-3 hidden">
-      <div class="relative"><input id="pbText" maxlength="30" placeholder="Nhập chữ của bạn" oninput="pbTextInput(this.value)" class="w-full bg-zinc-900/70 border border-white/10 rounded-xl pl-3 pr-14 py-3 text-[15px] font-semibold outline-none"><span id="pbCount" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-500">0/30</span></div>
-      <div class="flex flex-wrap gap-2 mt-2">${BOOTH_SUGGEST.map((t, i) => `<button onclick="pbChip(${i})" class="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-[13px] font-semibold">${t}</button>`).join('')}</div>
-    </div>
-    ${pbSec('Phông chữ')}<div class="flex bg-zinc-700/60 rounded-xl p-1 text-sm text-zinc-300">${Object.entries(BOOTH_FONTS).map(([k, f]) => pbSeg('font:' + k, f[0], 'whitespace-nowrap').replace('class="', `style="font:${boothFont(k, 14)}" class="`)).join('')}</div>
-    <div class="h-2"></div>`;
-  renderPbCustom(); pbDrawThumbs(); pbRefresh();
-}
-function renderPbCustom() {
-  $('pbCustomRow').innerHTML = `<button onclick="$('pbFrameInput').click()" class="flex flex-col items-center gap-1.5 w-16 shrink-0">${PB_ICON_CUSTOM}<span class="text-[11px] text-yellow-400 font-semibold">Đăng khung</span></button>`
-    + (customFrame ? `<div class="relative shrink-0">${pbTile('bg:custom:', 'Khung của bạn', pbCv('bg:custom:'))}<button onclick="pbRemoveCustom()" class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-zinc-900 border border-white/30 text-[10px] leading-none" title="Xoá khung">✕</button></div>` : '');
-  pbDrawThumbs(true);
-}
-function pbDrawThumbs(onlyCustom = false) {
-  document.querySelectorAll('#pbBody canvas[data-draw]').forEach(cv => {
-    const [k, a, b] = cv.dataset.draw.split(':'), x = cv.getContext('2d'), n = cv.width;
-    if (onlyCustom && !(k === 'bg' && a === 'custom')) return;
-    if (k === 'style') { x.drawImage(pbStyled(a, 96), 0, 0, n, n); }
-    else if (k === 'bg') {
-      x.clearRect(0, 0, n, n);
-      if (a === 'custom') { x.fillStyle = '#ffffff'; x.fillRect(0, 0, n, n); if (customFrame) x.drawImage(customFrame, 0, 0, n, n); return; }
-      boothBackground(x, n, n, { kind: a, v: b }, null);
-      if (a === 'season') { x.font = `${n * .5}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(BOOTH_STICKERS[b][2], n / 2, n / 2 + 3); }
-    }
-  });
-}
-function pbPick(sel) {
-  const [k, a, b] = sel.split(':');
-  if (k === 'cap') draft.cap = a; else if (k === 'timer') draft.timer = +a; else if (k === 'layout') draft.layout = a; else if (k === 'style') draft.style = a; else if (k === 'mode') draft.textMode = a; else if (k === 'font') draft.font = a;
-  else if (k === 'bg') draft.bg = a === 'color' ? { kind: 'color', v: b } : { kind: a, v: b || '' };
-  if (k === 'mode' && (a === 'custom' || a === 'both') && !draft.text.trim()) { draft.text = BOOTH_SUGGEST[0]; }
-  pbRefresh();
-}
-function pbTextInput(v) { draft.text = v.slice(0, 30); $('pbCount').textContent = draft.text.length + '/30'; pbSchedule(); }
-function pbChip(i) { draft.text = BOOTH_SUGGEST[i]; if (draft.textMode === 'date' || draft.textMode === 'none') draft.textMode = 'custom'; pbRefresh(); }
-function pbRemoveCustom() {
-  customFrame = null; try { localStorage.removeItem('locket_pb_frame'); } catch {}
-  if (draft.bg.kind === 'custom') draft.bg = { kind: 'color', v: '#ffffff' }; if (pb.bg.kind === 'custom') pb.bg = { kind: 'color', v: '#ffffff' };
-  renderPbCustom(); pbRefresh();
-}
-const pbSchedule = () => { if (!pbRaf) pbRaf = requestAnimationFrame(() => { pbRaf = 0; pbPaint(); }); };
-function pbRefresh() {
-  if (!draft) return;
-  const d = draft, cur = new Set([`cap:${d.cap || 'auto'}`, `timer:${d.timer}`, `layout:${d.layout}`, `style:${d.style}`, `mode:${d.textMode}`, `font:${d.font}`, d.bg.kind === 'color' ? `bg:color:${d.bg.v}` : `bg:${d.bg.kind}:${d.bg.v || ''}`]);
-  document.querySelectorAll('#pbBody [data-sel]').forEach(el => {
-    const on = cur.has(el.dataset.sel);
-    if (el.dataset.seg) el.classList.toggle('seg-on', on);
-    else { const r = el.classList.contains('pbRing') ? el : el.querySelector('.pbRing'); if (r) r.classList.toggle('ring-y', on); const l = el.querySelector('.pbLab'); if (l) l.classList.toggle('text-yellow-400', on); }
-  });
-  const show_ = d.textMode === 'custom' || d.textMode === 'both'; $('pbTextBox').classList.toggle('hidden', !show_);
-  if ($('pbText').value !== d.text) $('pbText').value = d.text; $('pbCount').textContent = d.text.length + '/30';
-  $('pbTimerBox').classList.toggle('hidden', d.cap === 'manual');
-  $('pbCapHint').textContent = d.cap === 'manual' ? 'Bạn tự bấm nút chụp cho từng ảnh; đủ 4 ảnh sẽ tự ghép. Chạm vào ảnh nhỏ để chụp lại.' : 'Chạm nút chụp: đếm ngược rồi chụp liền 4 ảnh, ghép thành một ảnh để gửi.';
+  $('pbTimer').innerHTML = [3, 5, 10].map(s => `<button onclick="draft.timer=${s};renderPb()" class="flex-1 py-2 rounded-lg ${draft.timer === s ? 'seg-on' : ''}">${s} giây</button>`).join('');
+  $('pbLayout').innerHTML = LAYOUTS.map(([k, n]) => `<button onclick="draft.layout='${k}';renderPb()" class="text-center">
+    <div class="aspect-square rounded-xl p-1.5 ${draft.layout === k ? 'ring-y' : ''}" style="background:${draft.color}">${miniLayout[k]}</div>
+    <span class="text-xs font-semibold ${draft.layout === k ? 'text-yellow-400' : 'text-zinc-400'}">${n}</span></button>`).join('');
+  $('pbColor').innerHTML = COLORS.map(c => `<button onclick="draft.color='${c}';draft.bgClass='';renderPb()" class="w-9 h-9 shrink-0 rounded-full border border-zinc-600 ${draft.color === c && !draft.bgClass ? 'ring-y' : ''}" style="background:${c}"></button>`).join('');
+  $('pbPattern').innerHTML = PATTERNS.map(p => `<button onclick="draft.bgClass='${p.cls}';draft.color='transparent';renderPb()" class="w-12 h-12 shrink-0 rounded-lg border border-zinc-600 ${draft.bgClass === p.cls ? 'ring-y' : ''} ${p.cls}" style="${p.style||''}" title="${p.name}"></button>`).join('');
   $('pbOff').classList.toggle('hidden', !pb.on);
-  pbPaint();
 }
-function pbPaint() {
-  if (!draft || $('pbModal').classList.contains('hidden') && !$('pbPreview')) return;
-  const pv = $('pbPreview'); if (!pv) return;
-  const fr = pbFrames(draft.style, 360); pv.getContext('2d').drawImage(composeBooth(fr, draft, 520, customFrame), 0, 0, 520, 520);
-  document.querySelectorAll('#pbBody canvas[data-draw^="layout:"]').forEach(cv => {
-    cv.getContext('2d').drawImage(composeBooth(fr, { ...draft, layout: cv.dataset.draw.split(':')[1], textMode: draft.textMode }, 180, customFrame), 0, 0, 180, 180);
-  });
-}
-function openPb() { if (busy) return; draft = JSON.parse(JSON.stringify(pb)); renderPb(); show($('pbModal')); ensureBoothFonts().then(pbSchedule); }
-function pbCancel() { hide($('pbModal')); draft = null; }
-function pbDone() { recMode.on = false; dual.on = false; boom.on = false; syncRecFx(); pb = { ...draft, on: true }; hide($('pbModal')); draft = null; try { const { on, ...keep } = pb; localStorage.setItem('locket_pb', JSON.stringify(keep)); } catch {} refreshCamUI(); }
-function pbOff() { pb.on = false; hide($('pbModal')); draft = null; refreshCamUI(); }
-$('pbFrameInput').addEventListener('change', async e => {
-  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
-  try {
-    const bmp = await createImageBitmap(f), c = mkCanvas(1200, 1200); c.getContext('2d').drawImage(bmp, 0, 0, 1200, 1200); customFrame = c;
-    try { localStorage.setItem('locket_pb_frame', c.toDataURL('image/png')); } catch { toast('Khung hơi nặng nên chỉ dùng được trong lần này', 4000); }
-    if (draft) { draft.bg = { kind: 'custom', v: '' }; renderPbCustom(); pbRefresh(); }
-  } catch { toast('❌ Không đọc được ảnh khung', 4000); }
-});
+function openPb() { if (busy) return; draft = { ...pb }; renderPb(); show($('pbModal')); }
+function pbDone() { pb = { ...draft, on: true }; hide($('pbModal')); refreshCamUI(); }
+function pbOff() { pb.on = false; hide($('pbModal')); refreshCamUI(); }
 
 function refreshCamUI() {
   const layName = LAYOUTS.find(l => l[0] === pb.layout)[1];
   $('pbBtnIcon').className = 'flex ' + (pb.on ? 'text-yellow-400' : 'text-white'); $('pbBtnIcon').innerHTML = PB_SVG(20);
-  $('shutterIn').innerHTML = recMode.on ? '<span class="block w-7 h-7 rounded-full bg-red-500"></span>' : boom.on ? `<span class="flex text-black">${INF_SVG}</span>` : dual.on ? `<span class="flex text-black">${DUAL_ICON(26)}</span>` : pb.on ? `<span class="flex text-black">${PB_SVG(26)}</span>` : '';
-  $('recBtn').style.color = recMode.on ? '#ef4444' : ''; $('dualBtn').style.color = dual.on ? '#facc15' : ''; $('boomBtn').style.color = boom.on ? '#facc15' : '';
-  const p = $('pbPill'); p.textContent = boom.on ? 'Boomerang · 1 giây' : dual.on ? `Dual camera · ${facing === 'user' ? 'Trước → Sau' : 'Sau → Trước'}` : recMode.on ? `Quay video · ${recMode.secs} giây${recMode.effect === 'heart' ? ' · Trái tim' : ''}` : `${layName} · ${pb.cap === 'manual' ? 'Tự bấm' : pb.timer + ' giây'}`;
-  p.classList.toggle('hidden', !(pb.on || recMode.on || dual.on || boom.on) || busy);
+  $('shutterIn').innerHTML = pb.on ? `<span class="flex text-black">${PB_SVG(26)}</span>` : '';
+  const p = $('pbPill'); p.textContent = `${layName} · ${pb.timer} giây`;
+  p.classList.toggle('hidden', !pb.on || busy);
 }
 
 /* ============ Camera & chụp ============ */
@@ -734,12 +749,11 @@ async function startCamera() {
   try {
     video.srcObject?.getTracks().forEach(t => t.stop());
     video.srcObject = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facing, width: { ideal: 1080 }, height: { ideal: 1080 } } });
-    return true;
-  } catch { toast('Không thể mở camera. Hãy cấp quyền camera và dùng HTTPS.', 5000); return false; }
+  } catch { toast('Không thể mở camera. Hãy cấp quyền camera và dùng HTTPS.', 5000); }
 }
-function switchCamera() { if (busy) return; facing = facing === 'user' ? 'environment' : 'user'; startCamera(); refreshCamUI(); }
+function switchCamera() { if (busy) return; facing = facing === 'user' ? 'environment' : 'user'; startCamera(); }
 
-/* ===== Bộ lọc / hiệu ứng (xử lý pixel trên canvas, chạy được cả Safari) ===== */
+/* ===== Bộ lọc / hiệu ứng & Tích hợp trái tim tối ưu ===== */
 const FILTERS = {
   orig:  { n: 'Gốc' },
   clear: { n: 'Trong trẻo', p: { br: 6, ct: 1.1, sat: 1.18 } },
@@ -749,267 +763,28 @@ const FILTERS = {
   pink:  { n: 'Hồng',   p: { br: 8, ct: .98, sat: 1.05, r: 14, g: -4, b: 8, fade: .06 } }
 };
 const EFFECTS = { none: { n: 'Không' }, dream: { n: 'Mờ màng' }, sun: { n: 'Ánh nắng' }, film: { n: 'Phim cũ' }, vhs: { n: 'VHS' }, glitch: { n: 'Glitch' }, bw: { n: 'Trắng đen' } };
-const FX0 = { filter: 'orig', fx: 'none', smooth: 0, bright: 0, face: 'none', hearts: false };
+const FX0 = { filter: 'orig', fx: 'none', smooth: 0, bright: 0, hearts: true }; // Mặc định bật hiệu ứng tim bay nhẹ nhàng khi đưa tay
 let FX = { ...FX0 };
-const fxActive = c => c.filter !== 'orig' || c.fx !== 'none' || c.smooth > 0 || c.bright > 0 || (c.face && c.face !== 'none');
+const fxActive = c => c.filter !== 'orig' || c.fx !== 'none' || c.smooth > 0 || c.bright > 0;
 
-/* FACE-FX */
-
-/* ===== Hiệu ứng AR trên khuôn mặt: vẽ bằng canvas 2D lên 478 điểm mặt của MediaPipe ===== */
-const FACE_GROUPS = [
-  ['Looks', '🧑‍🎤', [['braces', 'Braces', '😁'], ['beard', 'Beard', '🧔'], ['buns', 'Buns', '🎀'], ['tatted', 'Tatted', '🖋️']]],
-  ['Celebrate', '🎉', [['princess', 'Princess', '👑'], ['slimed', 'Slimed', '🟢'], ['birthday', 'Happy Birthday', '🥳'], ['cash', 'Ca$h Money', '💵']]],
-  ['Cute', '🌸', [['flower', 'Flower Crown', '🌸'], ['cutesy', 'Cutesy', '🥰'], ['lovebug', 'Love Bug', '💕']]]
-];
-const OVAL_TOP = [162, 21, 54, 103, 67, 109, 10, 338, 297, 332, 284, 251, 389];   // viền trán, trái -> phải
-const JAW = [234, 93, 132, 58, 172, 136, 150, 149, 176, 148, 152, 377, 400, 378, 379, 365, 397, 288, 361, 323, 454];
-const LIP_UP = [78, 191, 80, 81, 82, 13, 312, 311, 310, 415, 308], LIP_LO = [78, 95, 88, 178, 87, 14, 317, 402, 318, 324, 308];
-const LIP_OUT = [61, 146, 91, 181, 84, 17, 314, 405, 321, 375, 291, 409, 270, 269, 267, 0, 37, 39, 40, 185];
-
-function faceGeom(L) {
-  const top = L[10], chin = L[152], le = L[234], re = L[454];
-  const w = Math.hypot(re.x - le.x, re.y - le.y), h = Math.hypot(top.x - chin.x, top.y - chin.y);
-  return { w, h, ux: (top.x - chin.x) / h, uy: (top.y - chin.y) / h, ang: Math.atan2(re.y - le.y, re.x - le.x), top, chin, c: { x: (top.x + chin.x) / 2, y: (top.y + chin.y) / 2 } };
-}
-const fUp = (p, g, k) => ({ x: p.x + g.ux * g.h * k, y: p.y + g.uy * g.h * k });                       // đi lên theo trục đầu (k tính theo chiều cao mặt)
-const fSide = (p, g, k) => ({ x: p.x + Math.cos(g.ang) * g.w * k, y: p.y + Math.sin(g.ang) * g.w * k });   // sang phải theo trục ngang đầu
-const fOut = (p, g, k) => { const dx = p.x - g.c.x, dy = p.y - g.c.y, d = Math.hypot(dx, dy) || 1; return { x: p.x + dx / d * g.h * k, y: p.y + dy / d * g.h * k }; };   // đẩy ra ngoài tâm mặt
-const fMid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
-function fPoly(x, pts, close) { x.beginPath(); pts.forEach((p, i) => i ? x.lineTo(p.x, p.y) : x.moveTo(p.x, p.y)); if (close) x.closePath(); }
-function fSmooth(x, pts, move = true) {   // đường cong mượt đi qua các điểm
-  if (move) x.moveTo(pts[0].x, pts[0].y); else x.lineTo(pts[0].x, pts[0].y);
-  for (let i = 1; i < pts.length - 1; i++) { const m = fMid(pts[i], pts[i + 1]); x.quadraticCurveTo(pts[i].x, pts[i].y, m.x, m.y); }
-  x.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
-}
-function fAt(pts, t) {   // điểm ở vị trí t (0..1) dọc theo đường gấp khúc
-  const seg = []; let tot = 0;
-  for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y); seg.push(d); tot += d; }
-  let tgt = t * tot, i = 0; while (i < seg.length - 1 && tgt > seg[i]) { tgt -= seg[i]; i++; }
-  const k = seg[i] ? tgt / seg[i] : 0; return { x: pts[i].x + (pts[i + 1].x - pts[i].x) * k, y: pts[i].y + (pts[i + 1].y - pts[i].y) * k };
-}
-function fRng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
-function fHeart(x, cx, cy, s) {
-  x.beginPath(); x.moveTo(cx, cy + s * .9);
-  x.bezierCurveTo(cx - s * 1.5, cy - s * .2, cx - s * .8, cy - s * 1.2, cx, cy - s * .4);
-  x.bezierCurveTo(cx + s * .8, cy - s * 1.2, cx + s * 1.5, cy - s * .2, cx, cy + s * .9); x.closePath();
-}
-function fStar(x, cx, cy, r, a) {   // ngôi sao lấp lánh 4 cánh
-  x.beginPath();
-  for (let i = 0; i < 8; i++) { const ang = i * Math.PI / 4 - Math.PI / 2, rr = i % 2 ? r * .28 : r; x.lineTo(cx + Math.cos(ang) * rr, cy + Math.sin(ang) * rr); }
-  x.closePath(); x.globalAlpha = a; x.fill(); x.globalAlpha = 1;
-}
-const fFrac = v => v - Math.floor(v);
-
-const FACE_DRAW = {
-  princess(x, L, g) {
-    const c = fUp(g.top, g, 0.06), W = g.w * 0.78, H = g.h * 0.3;
-    x.save(); x.translate(c.x, c.y); x.rotate(g.ang);
-    const P = [[-.5, 0], [-.5, -.5], [-.34, -.3], [-.25, -.78], [-.12, -.36], [0, -1], [.12, -.36], [.25, -.78], [.34, -.3], [.5, -.5], [.5, 0]];
-    x.beginPath(); P.forEach(([a, b], i) => i ? x.lineTo(a * W, b * H) : x.moveTo(a * W, b * H)); x.closePath();
-    const gr = x.createLinearGradient(0, -H, 0, 0); gr.addColorStop(0, '#fbfcff'); gr.addColorStop(.55, '#cfd6e6'); gr.addColorStop(1, '#9aa5bf');
-    x.fillStyle = gr; x.fill(); x.lineWidth = W * 0.022; x.strokeStyle = '#ffffff'; x.lineJoin = 'round'; x.stroke();
-    x.lineWidth = W * 0.008; x.strokeStyle = 'rgba(80,90,120,.55)'; x.stroke();
-    x.fillStyle = 'rgba(120,130,160,.45)'; x.fillRect(-W / 2, -H * .12, W, H * .12);                // viền đáy
-    const gem = (px, py, r, col) => { x.beginPath(); x.arc(px * W, py * H, r, 0, 7); x.fillStyle = col; x.fill(); x.lineWidth = r * .3; x.strokeStyle = '#fff'; x.stroke(); x.beginPath(); x.arc(px * W - r * .3, py * H - r * .3, r * .28, 0, 7); x.fillStyle = 'rgba(255,255,255,.85)'; x.fill(); };
-    gem(0, -.62, W * .055, '#ff4f9a'); gem(-.25, -.5, W * .035, '#a98bff'); gem(.25, -.5, W * .035, '#a98bff'); gem(-.43, -.22, W * .026, '#7fd6ff'); gem(.43, -.22, W * .026, '#7fd6ff');
-    x.restore();
-  },
-  flower(x, L, g, size, t) {
-    const idx = [162, 54, 103, 109, 10, 338, 332, 284, 389], pts = idx.map(i => fOut(L[i], g, 0.045));
-    x.save(); x.lineCap = 'round';
-    x.beginPath(); fSmooth(x, pts); x.strokeStyle = '#4f9d4f'; x.lineWidth = g.w * 0.03; x.stroke();
-    const leaf = (px, py, a) => { x.save(); x.translate(px, py); x.rotate(a); x.beginPath(); x.ellipse(0, 0, g.w * .05, g.w * .022, 0, 0, 7); x.fillStyle = '#62b862'; x.fill(); x.restore(); };
-    for (let i = 0; i < pts.length - 1; i++) { const m = fMid(pts[i], pts[i + 1]); leaf(m.x, m.y, Math.atan2(pts[i + 1].y - pts[i].y, pts[i + 1].x - pts[i].x) + (i % 2 ? .7 : -.7)); }
-    const cols = ['#ff9ec4', '#ffffff', '#c9a6ff', '#ffc2d9', '#ffffff', '#ff9ec4'];
-    pts.forEach((p, i) => {
-      if (i % 2 === 1) return; const r = g.w * (i === 4 ? 0.075 : 0.06), col = cols[(i / 2) % cols.length | 0];
-      x.save(); x.translate(p.x, p.y); x.rotate(g.ang + i);
-      for (let k = 0; k < 5; k++) { x.save(); x.rotate(k * Math.PI * 2 / 5); x.beginPath(); x.ellipse(0, -r * .68, r * .5, r * .72, 0, 0, 7); x.fillStyle = col; x.fill(); x.lineWidth = r * .08; x.strokeStyle = 'rgba(190,90,130,.35)'; x.stroke(); x.restore(); }
-      x.beginPath(); x.arc(0, 0, r * .32, 0, 7); x.fillStyle = '#ffd84a'; x.fill(); x.restore();
-    });
-    x.restore();
-  },
-  lovebug(x, L, g, size, t) {
-    const pts = OVAL_TOP.slice(1, -1).map(i => fOut(L[i], g, 0.02));
-    x.save(); x.lineCap = 'round'; x.lineJoin = 'round';
-    x.beginPath(); fSmooth(x, pts); x.strokeStyle = 'rgba(60,60,70,.5)'; x.lineWidth = g.w * 0.05; x.stroke();
-    x.beginPath(); fSmooth(x, pts); x.strokeStyle = '#ffffff'; x.lineWidth = g.w * 0.035; x.stroke();
-    [[L[103], -1], [L[332], 1]].forEach(([b, s]) => {
-      const base = fOut(b, g, 0.02), sway = Math.sin(t / 380 + s) * g.w * 0.02;
-      const tip = fUp(fSide(base, g, s * 0.1), g, 0.24), c1 = fSide(fUp(base, g, 0.1), g, s * 0.06 + sway / g.w), c2 = fSide(fUp(base, g, 0.2), g, s * -0.02 + sway / g.w);
-      x.beginPath(); x.moveTo(base.x, base.y); x.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, tip.x, tip.y); x.strokeStyle = '#f4f4f4'; x.lineWidth = g.w * 0.016; x.stroke();
-      fHeart(x, tip.x, tip.y - g.w * 0.03, g.w * 0.075); x.fillStyle = '#ffd23a'; x.fill(); x.lineWidth = g.w * 0.012; x.strokeStyle = '#ff9a1f'; x.stroke();
-      x.beginPath(); x.arc(tip.x - g.w * 0.035, tip.y - g.w * 0.07, g.w * 0.012, 0, 7); x.fillStyle = 'rgba(255,255,255,.8)'; x.fill();
-    });
-    x.restore();
-  },
-  buns(x, L, g) {
-    x.save();
-    [-1, 1].forEach(s => {
-      const c = fUp(fSide(g.top, g, s * 0.3), g, 0.07), r = g.w * 0.2;
-      const gr = x.createRadialGradient(c.x - r * .3, c.y - r * .3, r * .1, c.x, c.y, r); gr.addColorStop(0, '#5a4030'); gr.addColorStop(1, '#1f1511');
-      x.beginPath(); x.arc(c.x, c.y, r, 0, 7); x.fillStyle = gr; x.fill();
-      x.strokeStyle = 'rgba(255,255,255,.12)'; x.lineWidth = r * .05;
-      for (let k = 0; k < 4; k++) { x.beginPath(); x.arc(c.x, c.y, r * (.3 + k * .17), .4 + k, 2.2 + k); x.stroke(); }
-      const b = fUp(c, g, -0.07); x.beginPath(); x.ellipse(b.x, b.y, r * .8, r * .2, g.ang, 0, 7); x.fillStyle = '#ff7fb2'; x.fill();
-    });
-    x.restore();
-  },
-  birthday(x, L, g, size, t) {
-    const c = fUp(g.top, g, 0.05), W = g.w * 0.46, H = g.h * 0.4;
-    x.save(); x.translate(c.x, c.y); x.rotate(g.ang + 0.12);
-    x.beginPath(); x.moveTo(-W / 2, 0); x.lineTo(0, -H); x.lineTo(W / 2, 0); x.closePath();
-    const gr = x.createLinearGradient(-W / 2, 0, W / 2, -H); gr.addColorStop(0, '#ff5fa2'); gr.addColorStop(1, '#8e5bff'); x.fillStyle = gr; x.fill();
-    x.save(); x.clip(); x.strokeStyle = 'rgba(255,255,255,.75)'; x.lineWidth = W * .07;
-    for (let k = -2; k < 7; k++) { x.beginPath(); x.moveTo(-W, -H * .13 * k + H * .1); x.lineTo(W, -H * .13 * k - H * .35); x.stroke(); } x.restore();
-    x.lineWidth = W * .03; x.strokeStyle = '#fff'; x.stroke();
-    x.fillStyle = '#ffe14a'; x.beginPath(); x.arc(0, -H, W * .13, 0, 7); x.fill(); x.lineWidth = W * .03; x.strokeStyle = '#fff'; x.stroke();
-    x.restore();
-    const cols = ['#ff5fa2', '#ffd23a', '#4ad7ff', '#8e5bff', '#6be36b', '#ff8a3a'], r = fRng(7);
-    for (let i = 0; i < 34; i++) {
-      const px = fFrac(i * 0.6180339 + .13) * size, py = ((t / 3200 + fFrac(i * 0.3819 + .2)) % 1) * size * 1.1 - size * .05, a = t / 400 + i;
-      x.save(); x.translate(px, py); x.rotate(a); x.fillStyle = cols[i % cols.length]; x.fillRect(-size * .008, -size * .004, size * .016, size * .008 + r() * size * .006); x.restore();
-    }
-  },
-  cash(x, L, g, size, t) {
-    for (let i = 0; i < 16; i++) {
-      const sp = 0.7 + fFrac(i * 0.7131) * 0.7, px = fFrac(i * 0.6180339 + .07) * size, py = ((t / 3600 * sp + fFrac(i * 0.4147 + .3)) % 1) * size * 1.2 - size * .1;
-      const w = size * 0.13, h = w * .48; x.save(); x.translate(px, py); x.rotate(Math.sin(t / 700 + i) * .6 + i); x.scale(1, Math.cos(t / 500 + i * 2) * .35 + .65);
-      x.fillStyle = '#7fcf8a'; x.fillRect(-w / 2, -h / 2, w, h); x.lineWidth = w * .03; x.strokeStyle = '#2f7d3f'; x.strokeRect(-w / 2 + w * .05, -h / 2 + h * .1, w * .9, h * .8);
-      x.beginPath(); x.arc(0, 0, h * .3, 0, 7); x.fillStyle = '#4fb061'; x.fill();
-      x.fillStyle = '#1f5f2e'; x.font = `bold ${h * .45}px system-ui, sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('$', 0, h * .03); x.restore();
-    }
-  },
-  slimed(x, L, g, size, t) {
-    const base = OVAL_TOP.map(i => fOut(L[i], g, 0.015)), N = 44, S = [];
-    for (let i = 0; i < N; i++) S.push(fAt(base, i / (N - 1)));
-    const drips = [[.1, .17, .035], [.26, .26, .04], [.42, .13, .03], [.58, .29, .042], [.74, .16, .033], [.9, .24, .04]];
-    const dep = s => { let d = 0.035; drips.forEach(([c, l, wd], k) => { const q = (s - c) / wd, grow = .88 + .12 * Math.sin(t / 650 + k * 1.7); d = Math.max(d, 0.035 + (l - 0.035) * grow * Math.exp(-q * q)); }); return d; };
-    const lo = S.map((p, i) => fUp(p, g, -dep(i / (N - 1)))), hi = S.map(p => fUp(p, g, 0.05));
-    x.save(); x.lineJoin = 'round'; x.beginPath(); fSmooth(x, hi); fSmooth(x, lo.slice().reverse(), false); x.closePath();
-    const gr = x.createLinearGradient(0, g.top.y - g.h * .1, 0, g.top.y + g.h * .3); gr.addColorStop(0, '#b6f05a'); gr.addColorStop(1, '#52b52a');
-    x.fillStyle = gr; x.fill(); x.lineWidth = g.w * 0.012; x.strokeStyle = '#3d9a22'; x.stroke();
-    drips.forEach(([c, l], k) => { const p = fUp(fAt(base, c), g, -(l * (.88 + .12 * Math.sin(t / 650 + k * 1.7)) - 0.03)); x.beginPath(); x.ellipse(p.x - g.w * .008, p.y, g.w * .008, g.w * .018, 0, 0, 7); x.fillStyle = 'rgba(255,255,255,.55)'; x.fill(); });
-    [[50, .03], [280, .026]].forEach(([i, r]) => { const p = L[i]; x.beginPath(); x.ellipse(p.x, p.y, g.w * r * 1.6, g.w * r * 1.2, 0, 0, 7); x.fillStyle = '#7ad43c'; x.fill(); x.lineWidth = g.w * .008; x.strokeStyle = '#3d9a22'; x.stroke(); });
-    x.restore();
-  },
-  braces(x, L, g) {
-    const open = Math.hypot(L[13].x - L[14].x, L[13].y - L[14].y) / g.h; if (open < 0.012) return;
-    const up = LIP_UP.map(i => L[i]), lo = LIP_LO.map(i => L[i]);
-    x.save(); fPoly(x, [...up, ...lo.slice().reverse()], true); x.clip();
-    const upW = up.map(p => fUp(p, g, -0.011)), loW = lo.map(p => fUp(p, g, 0.011));
-    x.lineCap = 'round'; x.lineJoin = 'round';
-    [[upW, 1], [loW, -1]].forEach(([w, dir]) => {
-      x.beginPath(); fSmooth(x, w); x.strokeStyle = '#8b94a8'; x.lineWidth = g.w * 0.016; x.stroke();
-      x.beginPath(); fSmooth(x, w); x.strokeStyle = '#e9edf5'; x.lineWidth = g.w * 0.008; x.stroke();
-      for (let k = 0; k < 8; k++) {
-        const p = fAt(w, .1 + k * .8 / 7), s = g.w * 0.03; x.save(); x.translate(p.x, p.y); x.rotate(g.ang);
-        const gr = x.createLinearGradient(-s, -s, s, s); gr.addColorStop(0, '#ffffff'); gr.addColorStop(1, '#9aa3b8'); x.fillStyle = gr; x.fillRect(-s * .6, -s * .6, s * 1.2, s * 1.2);
-        x.lineWidth = s * .12; x.strokeStyle = '#6b748a'; x.strokeRect(-s * .6, -s * .6, s * 1.2, s * 1.2);
-        x.fillStyle = k % 2 ? '#ff5fa2' : '#4ad7ff'; x.fillRect(-s * .28, -s * .28, s * .56, s * .56); x.restore();
-      }
-    });
-    x.restore();
-  },
-  beard(x, L, g) {
-    const jaw = JAW.map(i => fOut(L[i], g, 0.03));
-    // đường trong: từ tai phải, qua má, lên trên môi (ria mép), sang má trái về tai trái
-    const inner = [454, 411, 436, 326, 2, 97, 216, 187, 234].map(i => L[i]);
-    const lips = LIP_OUT.map(i => fOut(L[i], g, 0.006));
-    x.save(); x.beginPath(); x.moveTo(jaw[0].x, jaw[0].y);
-    for (let i = 1; i < jaw.length - 1; i++) { const m = fMid(jaw[i], jaw[i + 1]); x.quadraticCurveTo(jaw[i].x, jaw[i].y, m.x, m.y); }
-    x.lineTo(jaw[jaw.length - 1].x, jaw[jaw.length - 1].y);
-    fSmooth(x, inner, false); x.closePath();
-    lips.forEach((p, i) => i ? x.lineTo(p.x, p.y) : x.moveTo(p.x, p.y)); x.closePath();
-    const gr = x.createLinearGradient(0, g.top.y, 0, g.chin.y + g.h * .05); gr.addColorStop(0, '#3a2a20'); gr.addColorStop(1, '#1d140f');
-    x.fillStyle = gr; x.globalAlpha = .93; x.fill('evenodd'); x.globalAlpha = 1;
-    x.restore();
-  },
-  tatted(x, L, g, size, t) {
-    x.save(); x.globalCompositeOperation = 'multiply'; x.fillStyle = 'rgba(25,40,85,.8)'; x.strokeStyle = 'rgba(25,40,85,.8)'; x.lineCap = 'round'; x.lineJoin = 'round';
-    const f = fMid(g.top, fMid(L[107], L[336])); x.save(); x.translate(f.x, f.y); x.rotate(g.ang);
-    x.font = `900 ${g.w * 0.11}px Georgia, "Times New Roman", serif`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('LOVE', 0, 0); x.restore();
-    const star = (p, r) => { x.save(); x.translate(p.x, p.y); x.rotate(g.ang); x.beginPath(); for (let i = 0; i < 10; i++) { const a = i * Math.PI / 5 - Math.PI / 2, rr = i % 2 ? r * .45 : r; x.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); } x.closePath(); x.fill(); x.restore(); };
-    star(fMid(L[118], L[50]), g.w * 0.06);
-    const e = L[253]; x.beginPath(); x.moveTo(e.x, e.y + g.w * .03); x.bezierCurveTo(e.x - g.w * .045, e.y + g.w * .1, e.x + g.w * .045, e.y + g.w * .1, e.x, e.y + g.w * .03); x.fill();
-    const t1 = fMid(L[251], L[389]); x.lineWidth = g.w * .014; x.beginPath(); x.moveTo(t1.x, t1.y - g.w * .035); x.lineTo(t1.x, t1.y + g.w * .035); x.moveTo(t1.x - g.w * .025, t1.y - g.w * .005); x.lineTo(t1.x + g.w * .025, t1.y - g.w * .005); x.stroke();
-    x.restore();
-  },
-  cutesy(x, L, g, size, t) {
-    x.save();
-    [50, 280].forEach(i => { const p = fMid(L[i], L[i === 50 ? 205 : 425]), r = g.w * 0.17, gr = x.createRadialGradient(p.x, p.y, 0, p.x, p.y, r); gr.addColorStop(0, 'rgba(255,95,135,.55)'); gr.addColorStop(1, 'rgba(255,95,135,0)'); x.fillStyle = gr; x.beginPath(); x.arc(p.x, p.y, r, 0, 7); x.fill(); });
-    const r = fRng(11); x.fillStyle = 'rgba(150,85,50,.6)';
-    for (let i = 0; i < 16; i++) { const b = i < 8 ? L[50] : L[280], a = r() * 6.28, d = r() * g.w * 0.11; x.beginPath(); x.arc(b.x + Math.cos(a) * d, b.y - g.w * .03 + Math.sin(a) * d * .6, g.w * (.004 + r() * .004), 0, 7); x.fill(); }
-    x.fillStyle = '#ffffff';
-    [[L[33], -1], [L[263], 1]].forEach(([p, s], k) => { const q = fSide(fUp(p, g, 0.11), g, s * 0.1); x.shadowColor = '#ffd1ec'; x.shadowBlur = g.w * 0.05; fStar(x, q.x, q.y, g.w * (0.075 + .02 * Math.sin(t / 250 + k * 2)), .95); });
-    x.shadowBlur = 0; x.fillStyle = '#ff7fb2';
-    for (let i = 0; i < 4; i++) { const p = fUp(fSide(g.top, g, (i - 1.5) * 0.32), g, 0.14 + ((t / 2600 + i * .25) % 1) * 0.16); x.globalAlpha = 1 - ((t / 2600 + i * .25) % 1); fHeart(x, p.x, p.y, g.w * 0.035); x.fill(); }
-    x.globalAlpha = 1; x.restore();
-  }
-};
-function drawFace(x, key, L, size, t) {
-  const fn = FACE_DRAW[key]; if (!fn) return;
-  if (key === 'cash') { x.save(); fn(x, null, null, size, t); x.restore(); return; }   // mưa tiền không cần mặt
-  if (L && L.length > 400) { x.save(); fn(x, L, faceGeom(L), size, t); x.restore(); }
-}
-
-
-/* ===== Nhận diện khuôn mặt (MediaPipe Face Landmarker, chạy hoàn toàn trên máy bạn) ===== */
+/* --- Xử lý vẽ trái tim tối ưu (Chống spam, không giật lag) --- */
 const MP_BASE = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
-const MP_MODEL = 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task';
-let faceLm = null, faceLoading = null, lastFace = null, lastFaceT = 0, lastVidTime = -1, lastTs = 0;
-const needsFace = k => k && k !== 'none' && k !== 'cash';
-function ensureFace() {
-  if (faceLm) return Promise.resolve(faceLm);
-  if (faceLoading) return faceLoading;
-  toast('Đang tải bộ nhận diện khuôn mặt (lần đầu khoảng 10MB)...', 9000);
-  faceLoading = (async () => {
-    const mod = await import(MP_BASE + '/vision_bundle.mjs');
-    const fs = await mod.FilesetResolver.forVisionTasks(MP_BASE + '/wasm');
-    const make = d => mod.FaceLandmarker.createFromOptions(fs, { baseOptions: { modelAssetPath: MP_MODEL, delegate: d }, runningMode: 'VIDEO', numFaces: 1 });
-    try { faceLm = await make('GPU'); } catch { faceLm = await make('CPU'); }
-    toast('✅ Hiệu ứng khuôn mặt đã sẵn sàng', 2500); return faceLm;
-  })().catch(e => { faceLoading = null; FX.face = 'none'; fxMark(); toast('❌ Không tải được bộ nhận diện khuôn mặt: ' + (e && e.message || e), 7000); });
-  return faceLoading;
-}
-function detectFace() {
-  if (!needsFace(FX.face) || !faceLm || video.readyState < 2 || video.currentTime === lastVidTime) return;
-  lastVidTime = video.currentTime;
-  const ts = Math.round(performance.now()); if (ts <= lastTs) return; lastTs = ts;
-  try {
-    const f = (faceLm.detectForVideo(video, ts).faceLandmarks || [])[0];
-    if (!f) { lastFace = null; return; }
-    // làm mượt nhẹ để hiệu ứng không bị rung
-    lastFace = lastFace && lastFace.length === f.length ? f.map((p, i) => ({ x: lastFace[i].x * .35 + p.x * .65, y: lastFace[i].y * .35 + p.y * .65 })) : f.map(p => ({ x: p.x, y: p.y }));
-    lastFaceT = performance.now();
-  } catch { /* bỏ qua khung hình lỗi */ }
-}
-// Đổi toạ độ điểm mặt (theo khung video) sang toạ độ canvas vuông đã cắt giữa
-function drawFaceFx(x, key, size, t, vw, vh, s) {
-  let L = null;
-  if (needsFace(key) && lastFace && performance.now() - lastFaceT < 500) {
-    const ox = (vw - s) / 2, oy = (vh - s) / 2; L = lastFace.map(p => ({ x: (p.x * vw - ox) / s * size, y: (p.y * vh - oy) / s * size }));
-  }
-  drawFace(x, key, L, size, t);
-}
-
-/* ===== Hiệu ứng trái tim (Tối ưu theo hình mẫu, chống spam, không giật lag) ===== */
 const MP_HAND_MODEL = 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
-let handLm = null, handLoading = null, lastHandVid = -1, lastHandTs = 0, heartStable = 0, lastBurst = 0, lastHeartSeen = 0, lastStep = 0;
+let handLm = null, handLoading = null, lastHandVid = -1, lastHandTs = 0, heartStable = 0, lastBurst = 0, lastStep = 0;
 const hearts = [];
 
 function ensureHands() {
   if (handLm) return Promise.resolve(handLm);
   if (handLoading) return handLoading;
-  toast('Đang tải bộ nhận diện bàn tay...', 5000);
   handLoading = (async () => {
     const mod = await import(MP_BASE + '/vision_bundle.mjs'), fs = await mod.FilesetResolver.forVisionTasks(MP_BASE + '/wasm');
     const make = d => mod.HandLandmarker.createFromOptions(fs, { baseOptions: { modelAssetPath: MP_HAND_MODEL, delegate: d }, runningMode: 'VIDEO', numHands: 2 });
     try { handLm = await make('GPU'); } catch { handLm = await make('CPU'); }
-    toast('✅ Sẵn sàng: đưa hai tay tạo hình trái tim', 2500); return handLm;
-  })().catch(e => { handLoading = null; recMode.effect = 'none'; syncRecFx(); if ($('recFx')) renderRec(); refreshCamUI(); });
+    return handLm;
+  })().catch(() => { handLoading = null; });
   return handLoading;
 }
+ensureHands(); // Tự động load ngầm nhận diện bàn tay
 
 function heartGesture(hands, vw, vh) {
   if (!hands || hands.length < 2) return null;
@@ -1026,14 +801,18 @@ function heartGesture(hands, vw, vh) {
   return null;
 }
 
-// Chỉ bắn đúng 8 trái tim màu đỏ tươi, mềm mại bay lên
+function fHeart(x, cx, cy, s) {
+  x.beginPath(); x.moveTo(cx, cy + s * .9);
+  x.bezierCurveTo(cx - s * 1.5, cy - s * .2, cx - s * .8, cy - s * 1.2, cx, cy - s * .4);
+  x.bezierCurveTo(cx + s * .8, cy - s * 1.2, cx + s * 1.5, cy - s * .2, cx, cy + s * .9); x.closePath();
+}
+
 function burstHearts(cx, cy) {
   const now = performance.now();
-  // Chống spam: giới hạn cách nhau tối thiểu 2.5 giây mới bắn đợt tiếp theo
-  if (now - lastBurst < 2500) return;
+  if (now - lastBurst < 2500) return; // Chống spam: cách nhau tối thiểu 2.5 giây
   lastBurst = now;
 
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 8; i++) { // Đúng 8 trái tim giống mẫu
     const a = -Math.PI / 2 + (i - 3.5) * 0.22 + (Math.random() - 0.5) * 0.15;
     const sp = 0.15 + Math.random() * 0.2;
     hearts.push({
@@ -1041,14 +820,14 @@ function burstHearts(cx, cy) {
       y: cy + (Math.random() - 0.5) * 0.05,
       vx: Math.cos(a) * sp,
       vy: Math.sin(a) * sp - 0.25,
-      s: 0.08 + Math.random() * 0.04, // Kích thước trái tim lớn giống ảnh mẫu
+      s: 0.08 + Math.random() * 0.04,
       rot: (Math.random() - .5) * 0.4,
       vr: (Math.random() - .5) * 0.5,
       born: now,
       life: 2000 + Math.random() * 800
     });
   }
-  if (hearts.length > 16) hearts.splice(0, hearts.length - 16); // Giữ mảng luôn gọn nhẹ
+  if (hearts.length > 16) hearts.splice(0, hearts.length - 16);
 }
 
 function stepHearts(t) {
@@ -1056,9 +835,7 @@ function stepHearts(t) {
   for (let i = hearts.length - 1; i >= 0; i--) {
     const h = hearts[i]; 
     if (t - h.born > h.life) { hearts.splice(i, 1); continue; }
-    h.x += h.vx * dt; 
-    h.y += h.vy * dt; 
-    h.rot += h.vr * dt;
+    h.x += h.vx * dt; h.y += h.vy * dt; h.rot += h.vr * dt;
   }
 }
 
@@ -1066,7 +843,6 @@ function drawHearts(x, size, t) {
   hearts.forEach(h => {
     const age = (t - h.born) / h.life; 
     if (age < 0 || age > 1) return;
-    // Hiệu ứng mờ dần khi bay lên cao
     const alpha = age < 0.2 ? age * 5 : (age > 0.7 ? (1 - age) / 0.3 : 1);
     const s = h.s * size;
 
@@ -1074,22 +850,17 @@ function drawHearts(x, size, t) {
     x.translate(h.x * size, h.y * size); 
     x.rotate(h.rot); 
     x.globalAlpha = alpha * 0.95;
-    
-    // Màu đỏ tươi thuần, viền mềm giống hệt ảnh mẫu TikTok bạn cung cấp
-    x.fillStyle = '#ff2d46';
+    x.fillStyle = '#ff2d46'; // Đỏ tươi thuần, viền mềm mại giống ảnh mẫu TikTok
     fHeart(x, 0, 0, s); 
     x.fill(); 
-    
     x.restore();
   });
 }
 
 function detectHands() {
   if (!FX.hearts || !handLm || video.readyState < 2 || video.currentTime === lastHandVid) return;
-  
   const ts = Math.round(performance.now());
-  // Giới hạn tần suất quét (chỉ quét khoảng 5-6 lần mỗi giây để tiết kiệm tài nguyên, chống giật lag)
-  if (ts - lastHandTs < 180) return; 
+  if (ts - lastHandTs < 180) return; // Giới hạn tần suất quét để chống giật lag
   lastHandTs = ts;
   lastHandVid = video.currentTime;
 
@@ -1097,13 +868,9 @@ function detectHands() {
     const r = handLm.detectForVideo(video, ts), vw = video.videoWidth, vh = video.videoHeight, g = heartGesture(r.landmarks, vw, vh);
     heartStable = g ? heartStable + 1 : 0; 
     if (heartStable < 2) return;       
-    
-    const now = performance.now(), s = Math.min(vw, vh);
-    const cx = (g.x * vw - (vw - s) / 2) / s, cy = (g.y * vh - (vh - s) / 2) / s;
-    
-    // Kích hoạt bắn 8 tim
-    burstHearts(cx, cy);
-  } catch { /* bỏ qua khung hình lỗi */ }
+    const s = Math.min(vw, vh);
+    burstHearts((g.x * vw - (vw - s) / 2) / s, (g.y * vh - (vh - s) / 2) / s);
+  } catch {}
 }
 
 const TMP = {};
@@ -1127,7 +894,6 @@ function colorFilter(x, size, f) {
   }
   x.putImageData(id, 0, 0);
 }
-// Làm đẹp: làm mịn giữ cạnh (chỉ pha mờ ở vùng ít chi tiết, ưu tiên màu da) + sáng da
 function beauty(c, x, size, cfg) {
   const id = x.getImageData(0, 0, size, size), d = id.data;
   const bd = cfg.smooth > 0 ? blurred(c, size, 4).getContext('2d', { willReadFrequently: true }).getImageData(0, 0, size, size).data : null;
@@ -1156,7 +922,6 @@ function grain(x, size, amt) {
   x.putImageData(id, 0, 0);
 }
 function lightLayer(x, size, mode, alpha, draw) { x.globalCompositeOperation = mode; x.globalAlpha = alpha; draw(); x.globalAlpha = 1; x.globalCompositeOperation = 'source-over'; }
-// Tách kênh RGB + (VHS) dải nhiễu, vạch quét
 function chroma(x, size, dx, o = {}) {
   const id = x.getImageData(0, 0, size, size), d = id.data, src = new Uint8ClampedArray(d), mx = size - 1;
   const cl = v => v < 0 ? 0 : v > mx ? mx : v;
@@ -1205,7 +970,7 @@ function applyFx(c, x, size, t, cfg) {
     }
   }
 }
-// Vẽ khung hình camera (cắt vuông) vào canvas `out` rồi áp bộ lọc
+
 function process(out, size, t, cfg) {
   const vw = video.videoWidth, vh = video.videoHeight;
   if (!vw || video.readyState < 2) return false;
@@ -1214,15 +979,19 @@ function process(out, size, t, cfg) {
   const x = out.getContext('2d', { willReadFrequently: true });
   x.drawImage(video, (vw - s) / 2, (vh - s) / 2, s, s, 0, 0, size, size);
   if (fxActive(cfg)) applyFx(out, x, size, t, cfg);
-  if (cfg.face && cfg.face !== 'none') drawFaceFx(x, cfg.face, size, t, vw, vh, s);
-  if (cfg.hearts) drawHearts(x, size, t);
+  
+  detectHands();
+  stepHearts(t);
+  drawHearts(x, size, t);
+
   return true;
 }
+
 const camEl = $('cam'); let lastDraw = 0;
 function fxLoop(t) {
   requestAnimationFrame(fxLoop);
   if (t - lastDraw < 33 || $('view-upload').classList.contains('hidden') || !$('sendView').classList.contains('hidden')) return;
-  lastDraw = t; detectFace(); detectHands(); stepHearts(t); process(camEl, 540, t, FX);
+  lastDraw = t; process(camEl, 540, t, FX);
 }
 function captureFrame() {
   const s = Math.min(video.videoWidth || 720, video.videoHeight || 720, 1080);
@@ -1231,10 +1000,9 @@ function captureFrame() {
   return c;
 }
 
-/* ---- Giao diện sheet bộ lọc ---- */
 let fxTab = 'filter', thumbTimer = null;
-function openFx() { if (busy) return; hide($('faceSheet'), ''); hide($('recSheet'), ''); show($('fxSheet'), ''); fxTabSet(fxTab); clearInterval(thumbTimer); thumbTimer = setInterval(drawThumbs, 1500); }
-function closeFx() { hide($('fxSheet'), ''); hide($('faceSheet'), ''); hide($('recSheet'), ''); clearInterval(thumbTimer); }
+function openFx() { if (busy) return; show($('fxSheet'), ''); fxTabSet(fxTab); clearInterval(thumbTimer); thumbTimer = setInterval(drawThumbs, 1500); }
+function closeFx() { hide($('fxSheet'), ''); clearInterval(thumbTimer); }
 function fxTabSet(t) {
   fxTab = t;
   ['filter', 'beauty', 'fx'].forEach(k => $('ft-' + k).className = 'px-3 py-1 rounded-full ' + (k === t ? 'seg-on' : 'text-zinc-300'));
@@ -1260,31 +1028,10 @@ function fxMark() {
     const on = b.dataset.k === (fxTab === 'filter' ? FX.filter : FX.fx);
     b.querySelector('canvas').classList.toggle('ring-y', on); b.querySelector('span').className = 'text-[11px] ' + (on ? 'text-yellow-400' : 'text-zinc-300');
   });
-  $('fxBtn').style.color = (FX.filter !== 'orig' || FX.fx !== 'none' || FX.smooth > 0 || FX.bright > 0) ? '#facc15' : '';
-  markFace();
+  $('fxBtn').style.color = fxActive(FX) ? '#facc15' : '';
 }
-function renderFaceList() {
-  $('faceList').innerHTML = FACE_GROUPS.map(([name, ico, items]) => `<div class="flex items-center gap-2 mt-3 mb-2 text-[17px] font-semibold"><span>${ico}</span>${name}</div>
-    <div class="flex gap-4 overflow-x-auto pb-1" style="scrollbar-width:none">${items.map(([k, label, em]) => `<button onclick="pickFace('${k}')" data-k="${k}" class="faceItem flex flex-col items-center gap-1.5 w-[4.5rem] shrink-0">
-      <span class="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center text-[34px] shadow-lg" style="filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))">${em}</span>
-      <span class="text-[12px] font-medium text-center leading-tight">${label}</span></button>`).join('')}</div>`).join('');
-  markFace();
-}
-function markFace() {
-  document.querySelectorAll('#faceList .faceItem').forEach(b => {
-    const on = b.dataset.k === FX.face; b.firstElementChild.classList.toggle('ring-y', on); b.lastElementChild.classList.toggle('text-yellow-400', on);
-  });
-  $('faceBtn').style.color = FX.face !== 'none' ? '#facc15' : '';
-  const l = FACE_GROUPS.flatMap(g => g[2]).find(i => i[0] === FX.face); $('faceHint').textContent = l ? 'Đang dùng: ' + l[1] : 'Chọn một hiệu ứng';
-}
-function openFace() { if (busy) return; closeFx(); if (!$('faceList').firstChild) renderFaceList(); markFace(); show($('faceSheet'), ''); }
-function pickFace(k) {
-  FX.face = FX.face === k ? 'none' : k; markFace();
-  if (needsFace(FX.face)) { ensureFace(); if (!lastFace) toast('Hướng mặt vào camera để hiệu ứng hiện ra', 3000); }
-}
-function faceClear() { FX.face = 'none'; markFace(); }
 function fxReset() {
-  FX = { ...FX0 }; syncRecFx();
+  FX = { ...FX0 };
   $('fxSmooth').value = $('fxBright').value = 0; $('vSmooth').textContent = $('vBright').textContent = '0';
   fxMark();
 }
@@ -1301,42 +1048,6 @@ function countdown(sec) {
   });
 }
 
-/* ===== Photobooth chế độ "Tự bấm": mỗi lần chạm nút chụp là một ảnh ===== */
-const manual = { active: false, frames: [null, null, null, null], target: null, lock: false };
-function manualSlots() {
-  const s = $('slots');
-  s.innerHTML = [0, 1, 2, 3].map(i => `<button id="slot${i}" onclick="manualPick(${i})" title="Chạm để chụp lại ảnh này" class="w-9 h-9 rounded-md bg-black/50 border border-white/40 bg-cover bg-center pointer-events-auto"></button>`).join(''); show(s);
-}
-function manualMark() {
-  const next = manual.target != null ? manual.target : manual.frames.findIndex(f => !f), n = manual.frames.filter(Boolean).length;
-  [0, 1, 2, 3].forEach(i => { const e = $('slot' + i); if (e) e.classList.toggle('ring-y', i === next); });
-  const p = $('pbPill'); p.textContent = manual.target != null ? `Chụp lại ảnh ${manual.target + 1}` : `Ảnh ${Math.min(n + 1, 4)}/4 · chạm nút chụp`;
-  p.style.bottom = '3.9rem'; p.classList.remove('hidden');
-}
-function setManual(on) {
-  busy = on; manual.active = on; if (on) closeFx();
-  $('galBtn').style.opacity = $('swBtn').style.opacity = on ? .35 : 1;
-  $('galBtn').style.pointerEvents = $('swBtn').style.pointerEvents = on ? 'none' : '';
-  if (on) { manualSlots(); $('manualCancel').classList.remove('hidden'); manualMark(); }
-  else { hide($('slots')); $('manualCancel').classList.add('hidden'); $('pbPill').style.bottom = ''; manual.frames = [null, null, null, null]; manual.target = null; refreshCamUI(); }
-}
-function manualBlink() { const l = $('flashLayer'); l.style.opacity = '.5'; show(l, ''); setTimeout(() => { hide(l, ''); l.style.opacity = '.92'; }, 90); }
-async function manualShot() {
-  if (manual.lock) return; manual.lock = true;
-  try {
-    if (!manual.active) { if (!creds()) { showLogin(); return; } setManual(true); }
-    await flashStart(); const f = captureFrame(); flashEnd();
-    const i = manual.target != null ? manual.target : manual.frames.findIndex(x => !x);
-    manual.frames[i] = f; manual.target = null; $('slot' + i).style.backgroundImage = `url(${thumb(f)})`; manualBlink();
-    if (manual.frames.every(Boolean)) { const frames = manual.frames.slice(); toast('Đang ghép ảnh...', 3000); const blob = await stitch(frames); setManual(false); openSend(blob); }
-    else manualMark();
-  } catch (e) { toast('❌ ' + e.message, 4000); if (manual.active) setManual(false); }
-  finally { manual.lock = false; }
-}
-function manualPick(i) { if (!manual.active || !manual.frames[i]) return; manual.target = manual.target === i ? null : i; manualMark(); }
-function manualCancel() { if (!manual.active) return; setManual(false); toast('Đã huỷ phiên chụp', 2000); }
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && manual.active) manualCancel(); });
-
 function setCapturing(on) {
   busy = on; if (on) closeFx();
   $('galBtn').style.opacity = $('swBtn').style.opacity = on ? .35 : 1;
@@ -1350,10 +1061,6 @@ function setCapturing(on) {
 }
 
 async function onShutter() {
-  if (boom.on) { if (!busy) boomSession(); return; }                                   // chế độ Boomerang
-  if (dual.on) { if (busy) cancel = true; else dualSession(); return; }                // chế độ Dual camera
-  if (recMode.on) { if (recActive) stopRecording(); else if (busy) cancel = true; else recSession(); return; }   // chế độ Quay video
-  if (manual.active || (!busy && pb.on && pb.cap === 'manual')) return manualShot();   // chế độ Tự bấm
   if (busy) { cancel = true; return; }
   if (!creds()) { showLogin(); return; }
   cancel = false;
@@ -1393,8 +1100,8 @@ function flashEnd() {
   if (facing === 'environment' && torchOk() && !recActive) setTorch(false);
 }
 
-/* ============ Quay video (giữ nút chụp, tối đa 10 giây) ============ */
-let recMax = 10000;   // ms, đặt theo lựa chọn 5/10/15 giây
+/* ============ Quay video ============ */
+const REC_MAX = 10000;
 let recorder = null, recChunks = [], recActive = false, recStarting = false, stopWanted = false, recStartT = 0, recTick = null, recStopT = null;
 let recThumbCv = null, recAudio = null, holdT = null, holding = false, recDiscard = false, recMime = '', shutterSwallow = false;
 function pickMime() {
@@ -1413,15 +1120,14 @@ function setRecording(on) {
 }
 function tickRec() {
   const el = performance.now() - recStartT;
-  $('recRing').firstElementChild.setAttribute('stroke-dashoffset', (216.8 * (1 - Math.min(1, el / recMax))).toFixed(1));
-  $('recTime').textContent = '0:' + String(Math.floor(el / 1000)).padStart(2, '0') + ' / 0:' + String(Math.round(recMax / 1000)).padStart(2, '0');
+  $('recRing').firstElementChild.setAttribute('stroke-dashoffset', (216.8 * (1 - Math.min(1, el / REC_MAX))).toFixed(1));
+  $('recTime').textContent = '0:' + String(Math.floor(el / 1000)).padStart(2, '0');
 }
-async function startRecording(maxMs = 10000, force = false) {
-  if (recActive || (busy && !force)) return;
-  recMax = maxMs;
+async function startRecording() {
+  if (recActive || busy) return;
   if (!window.MediaRecorder || !camEl.captureStream) { toast('Trình duyệt chưa hỗ trợ quay video'); return; }
   closeFx();
-  const stream = camEl.captureStream(30); // quay đúng khung đã áp bộ lọc/hiệu ứng
+  const stream = camEl.captureStream(30);
   try { recAudio = await navigator.mediaDevices.getUserMedia({ audio: true }); recAudio.getAudioTracks().forEach(t => stream.addTrack(t)); }
   catch { recAudio = null; toast('Không dùng được micro, video sẽ không có tiếng', 3500); }
   recMime = pickMime();
@@ -1433,7 +1139,7 @@ async function startRecording(maxMs = 10000, force = false) {
   if (flashOn && facing === 'environment' && torchOk()) setTorch(true);
   recorder.start(250); recActive = true; recStartT = performance.now(); setRecording(true);
   setTimeout(() => { if (recActive && !recThumbCv) recThumbCv = captureFrame(); }, 400);
-  recTick = setInterval(tickRec, 100); recStopT = setTimeout(() => stopRecording(), recMax);
+  recTick = setInterval(tickRec, 100); recStopT = setTimeout(() => stopRecording(), REC_MAX);
 }
 function stopRecording(discard = false) {
   if (!recActive) return;
@@ -1450,159 +1156,12 @@ async function finishRecording() {
   if (blob.size > 4.2 * 1024 * 1024) { toast('Video lớn hơn 4MB nên máy chủ không nhận được, hãy quay ngắn hơn', 5000); return; }
   openSend(await toJpeg(cv), blob);
 }
-/* ===== Dual camera & Boomerang ===== */
-const dual = { on: false, a: null, b: null, layout: 'tl', swap: false };
-const boom = { on: false };
-const DUAL_LAYOUTS = ['tl', 'tr', 'br', 'bl', 'split'];
-const BOOM = { n: 12, gap: 80, fps: 15, loops: 2, size: 720 };
-const INF_SVG = '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 12c-2-2.6-3.6-4-5.4-4a4 4 0 0 0 0 8c1.8 0 3.4-1.4 5.4-4zm0 0c2 2.6 3.6 4 5.4 4a4 4 0 0 0 0-8c-1.8 0-3.4 1.4-5.4 4z"/></svg>';
-const DUAL_ICON = n => `<svg width="${n}" height="${n}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="3.5"/><rect x="7.5" y="7.5" width="6" height="6" rx="1.5" fill="currentColor" stroke="none"/></svg>`;
-function sideLock(on) {
-  $('galBtn').style.opacity = $('swBtn').style.opacity = on ? .35 : 1;
-  $('galBtn').style.pointerEvents = $('swBtn').style.pointerEvents = on ? 'none' : '';
-}
-// Chỉ một chế độ chụp được bật cùng lúc: thường / Photobooth / Quay video / Dual camera / Boomerang
-function capModeOnly(mode) { pb.on = mode === 'pb'; recMode.on = mode === 'rec'; dual.on = mode === 'dual'; boom.on = mode === 'boom'; syncRecFx(); refreshCamUI(); }
-function toggleDual() {
-  if (busy) return; closeFx(); const on = !dual.on; capModeOnly(on ? 'dual' : 'none');
-  toast(on ? 'Dual camera: chụp xong camera này sẽ tự đổi sang camera kia, đếm 3-2-1 rồi chụp tiếp' : 'Đã tắt Dual camera', 3200);
-}
-function toggleBoom() {
-  if (busy) return; closeFx(); const on = !boom.on; capModeOnly(on ? 'boom' : 'none');
-  toast(on ? 'Boomerang: chạm nút chụp để quay 1 giây, video phát tới rồi lui lặp lại' : 'Đã tắt Boomerang', 3200);
-}
-async function waitVideoReady(ms = 5000) {
-  const t0 = performance.now();
-  while (performance.now() - t0 < ms) { if (video.readyState >= 2 && video.videoWidth > 0) { await sleep(350); return true; } await sleep(60); }
-  return false;
-}
-// Ghép: ảnh chính phủ kín khung vuông, ảnh nhỏ (tỉ lệ 3:4) bo góc có viền đen ở một góc; hoặc chia đôi trên/dưới
-function composeDual(main, inset, layout, S = 1080) {
-  const c = mkCanvas(S, S), x = c.getContext('2d'); x.fillStyle = '#000'; x.fillRect(0, 0, S, S);
-  const cell = (img, px, py, w, h) => { x.save(); x.beginPath(); x.rect(px, py, w, h); x.clip(); bCover(x, img, px, py, w, h); x.restore(); };
-  if (layout === 'split') { cell(main, 0, 0, S, S / 2 - S * .004); cell(inset, 0, S / 2 + S * .004, S, S / 2 - S * .004); return c; }
-  bCover(x, main, 0, 0, S, S);
-  const iw = S * .31, ih = iw * 4 / 3, m = S * .04, bd = S * .011;
-  const px = layout === 'tr' || layout === 'br' ? S - m - iw : m, py = layout === 'bl' || layout === 'br' ? S - m - ih : m;
-  x.save(); x.shadowColor = 'rgba(0,0,0,.4)'; x.shadowBlur = S * .02; x.fillStyle = '#000'; bRR(x, px - bd, py - bd, iw + 2 * bd, ih + 2 * bd, S * .055); x.fill(); x.restore();
-  x.save(); bRR(x, px, py, iw, ih, S * .045); x.clip(); bCover(x, inset, px, py, iw, ih); x.restore();
-  return c;
-}
-function dualCompose() {
-  const a = dual.a, b = dual.b, back = [a, b].find(v => v.facing === 'environment') || b, front = [a, b].find(v => v.facing === 'user') || a;
-  const main = dual.swap ? front : back, inset = dual.swap ? back : front;
-  return composeDual(main.cv, inset.cv, dual.layout);
-}
-async function dualRefresh() {
-  if (!dual.a) return; const blob = await toJpeg(dualCompose()); if (!dual.a || !blob) return;
-  if (pendingUrl) URL.revokeObjectURL(pendingUrl); pending = blob; pendingUrl = URL.createObjectURL(blob); $('sendImg').src = pendingUrl;
-}
-const dualSwap = () => { if (dual.a) { dual.swap = !dual.swap; dualRefresh(); } };
-const dualLayout = () => { if (dual.a) { dual.layout = DUAL_LAYOUTS[(DUAL_LAYOUTS.indexOf(dual.layout) + 1) % DUAL_LAYOUTS.length]; dualRefresh(); } };
-// Chụp camera hiện tại -> tự đổi sang camera kia -> đếm 3-2-1 -> chụp tiếp -> ghép
-async function dualSession() {
-  if (busy) return; if (!creds()) { showLogin(); return; }
-  cancel = false; closeFx(); busy = true; sideLock(true);
-  const first = facing, second = first === 'user' ? 'environment' : 'user', name = f => f === 'user' ? 'trước' : 'sau';
-  const say = t => { const p = $('pbPill'); p.textContent = t; p.classList.remove('hidden'); };
-  let A = null, B = null;
-  try {
-    await flashStart(); A = captureFrame(); flashEnd(); manualBlink();
-    say(`Đang đổi sang camera ${name(second)}...`);
-    facing = second;
-    if (!(await startCamera()) || !(await waitVideoReady())) throw new Error('nocam');
-    say(`Chụp camera ${name(second)} sau 3 giây`);
-    if (!(await countdown(3))) throw new Error('cancel');
-    await flashStart(); B = captureFrame(); flashEnd(); manualBlink();
-  } catch (e) {
-    if (e.message === 'cancel') A = null;                                   // huỷ giữa chừng: bỏ cả phiên
-    else if (e.message === 'nocam') toast('Không mở được camera thứ hai, chỉ dùng ảnh đầu tiên', 4000);
-    else toast('❌ ' + e.message, 4000);
-    B = null;
-  }
-  if (facing !== first) { facing = first; startCamera(); }                   // trả camera về như ban đầu
-  busy = false; sideLock(false); $('cdNum').classList.add('hidden'); cancel = false; refreshCamUI();
-  if (!A) return;
-  if (!B) { openSend(await toJpeg(A)); return; }
-  dual.a = { cv: A, facing: first }; dual.b = { cv: B, facing: second }; dual.layout = 'tl'; dual.swap = false;
-  openSend(await toJpeg(dualCompose())); $('dualCtl').classList.remove('hidden'); $('dualCtl').classList.add('flex');
-}
-
-// Boomerang: chụp nhanh 12 khung hình (~1 giây) rồi tạo video phát tới-lui lặp lại
-const boomSeq = (n, loops) => { const one = [...Array(n).keys()], back = one.slice(1, -1).reverse(); let seq = []; for (let i = 0; i < loops; i++) seq = seq.concat(one, back); return seq; };
-function grabFrame(size) {
-  const c = mkCanvas(size, size); if (!process(c, size, performance.now(), FX)) { const x = c.getContext('2d'); x.fillStyle = '#000'; x.fillRect(0, 0, size, size); } return c;
-}
-function boomVideo(frames) {
-  return new Promise((resolve, reject) => {
-    const S = BOOM.size, c = mkCanvas(S, S), x = c.getContext('2d'), mime = pickMime(), chunks = [];
-    let rec; try { rec = new MediaRecorder(c.captureStream(BOOM.fps), { ...(mime ? { mimeType: mime } : {}), videoBitsPerSecond: 2000000 }); } catch (e) { reject(e); return; }
-    rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
-    rec.onstop = () => resolve(new Blob(chunks, { type: (rec.mimeType || mime || 'video/webm').split(';')[0] }));
-    const seq = boomSeq(frames.length, BOOM.loops); let k = 0; x.drawImage(frames[seq[0]], 0, 0, S, S); rec.start(100);
-    const t = setInterval(() => { if (++k >= seq.length) { clearInterval(t); setTimeout(() => rec.stop(), 150); return; } x.drawImage(frames[seq[k]], 0, 0, S, S); }, 1000 / BOOM.fps);
-  });
-}
-async function boomSession() {
-  if (busy) return; if (!creds()) { showLogin(); return; }
-  if (!window.MediaRecorder || !mkCanvas(2, 2).captureStream) { toast('Trình duyệt chưa hỗ trợ tạo video boomerang'); return; }
-  closeFx(); busy = true; sideLock(true); show($('recBadge')); $('recRing').classList.remove('hidden'); $('recTime').textContent = 'Boomerang'; manualBlink();
-  const ring = $('recRing').firstElementChild, frames = [];
-  try {
-    for (let i = 0; i < BOOM.n; i++) { frames.push(grabFrame(BOOM.size)); ring.setAttribute('stroke-dashoffset', (216.8 * (1 - (i + 1) / BOOM.n)).toFixed(1)); await sleep(BOOM.gap); }
-    $('recTime').textContent = 'Đang tạo video...';
-    const video_ = await boomVideo(frames), thumbBlob = await toJpeg(frames[0]);
-    if (!video_.size) throw new Error('Không tạo được video'); openSend(thumbBlob, video_);
-  } catch (e) { toast('❌ ' + e.message, 4000); }
-  finally { hide($('recBadge')); $('recRing').classList.add('hidden'); ring.setAttribute('stroke-dashoffset', '216.8'); $('recTime').textContent = '0:00'; busy = false; sideLock(false); cancel = false; refreshCamUI(); }
-}
-
-/* ===== Chế độ Quay video (riêng, không gộp với Photobooth) ===== */
-const REC_SECS = [5, 10, 15];
-const REC_EFFECTS = [['none', 'Không', '🚫'], ['heart', 'Trái tim', '❤️']];
-let recMode = { on: false, secs: 10, effect: 'none' };
-try { const sv = JSON.parse(localStorage.getItem('locket_rec') || 'null'); if (sv) recMode = { ...recMode, ...sv, on: false }; } catch {}
-if (!REC_SECS.includes(recMode.secs)) recMode.secs = 10;
-if (!REC_EFFECTS.some(e => e[0] === recMode.effect)) recMode.effect = 'none';
-const recSave = () => { try { const { on, ...k } = recMode; localStorage.setItem('locket_rec', JSON.stringify(k)); } catch {} };
-function syncRecFx() {
-  FX.hearts = recMode.on && recMode.effect === 'heart';
-  if (FX.hearts) ensureHands(); else { hearts.length = 0; heartStable = 0; }
-}
-function renderRec() {
-  $('recSecs').innerHTML = REC_SECS.map(n => `<button onclick="recPick('secs',${n})" class="flex-1 py-2 rounded-lg ${recMode.secs === n ? 'seg-on' : ''}">${n} giây</button>`).join('');
-  $('recFx').innerHTML = REC_EFFECTS.map(([k, n, em]) => `<button onclick="recPick('fx','${k}')" class="flex flex-col items-center gap-1.5 w-[4.5rem] shrink-0">
-    <span class="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center text-[34px] shadow-lg ${recMode.effect === k ? 'ring-y' : ''}">${em}</span>
-    <span class="text-[12px] font-medium ${recMode.effect === k ? 'text-yellow-400' : ''}">${n}</span></button>`).join('');
-  $('recHint').textContent = recMode.effect === 'heart' ? 'Đưa hai tay tạo hình trái tim vào camera, trái tim sẽ bắn ra khắp màn hình.' : '';
-}
-function recPick(k, v) { if (k === 'secs') recMode.secs = +v; else recMode.effect = v; recSave(); renderRec(); syncRecFx(); refreshCamUI(); }
-function openRec() {
-  if (busy) return; closeFx();
-  if (!recMode.on) { recMode.on = true; pb.on = false; dual.on = false; boom.on = false; }      // bật chế độ quay thì tắt các chế độ khác
-  syncRecFx(); renderRec(); refreshCamUI(); show($('recSheet'), '');
-}
-function recOff() { recMode.on = false; syncRecFx(); closeFx(); refreshCamUI(); toast('Đã tắt chế độ quay video', 2000); }
-// Bấm nút quay: đếm ngược 3 giây rồi tự quay đủ thời gian đã chọn (chạm lần nữa để dừng sớm)
-async function recSession() {
-  if (busy || recActive) return;
-  if (!creds()) { showLogin(); return; }
-  cancel = false; closeFx(); setCapturing(true);
-  if (!(await countdown(3))) { setCapturing(false); cancel = false; return; }
-  recStarting = true;
-  try { await startRecording(recMode.secs * 1000, true); } finally { recStarting = false; }
-  if (!recActive) setCapturing(false);
-}
-
-// Chạm = chụp ảnh / photobooth, giữ = quay video (không dùng khi bật photobooth)
 function shutterDown(e) {
   if (e.currentTarget.setPointerCapture) { try { e.currentTarget.setPointerCapture(e.pointerId); } catch {} }
-  if (recActive && recMode.on) { shutterSwallow = true; stopRecording(); return; }               // Quay video: chạm để dừng sớm
-  if (manual.active) { shutterSwallow = true; manualShot(); return; }                        // Tự bấm: mỗi lần chạm là một ảnh
-  if (busy && !recActive && !recStarting) { cancel = true; shutterSwallow = true; return; } // đang photobooth tự động: bấm để dừng
+  if (busy && !recActive && !recStarting) { cancel = true; shutterSwallow = true; return; }
   if (busy) return;
   holding = false; shutterSwallow = false;
-  if (!pb.on && !recMode.on && !dual.on && !boom.on) holdT = setTimeout(async () => {
+  if (!pb.on) holdT = setTimeout(async () => {
     if (!creds()) { showLogin(); return; }
     holding = true; recStarting = true; await startRecording(); recStarting = false;
     if (stopWanted) { stopWanted = false; stopRecording(); }
@@ -1622,15 +1181,40 @@ function cover(x, src, px, py, w, h) {
   const s = Math.max(w / src.width, h / src.height), dw = src.width * s, dh = src.height * s;
   x.save(); x.beginPath(); x.rect(px, py, w, h); x.clip(); x.drawImage(src, px + (w - dw) / 2, py + (h - dh) / 2, dw, dh); x.restore();
 }
-async function stitch(frames) {
-  frames.forEach(f => boothStyle(f, pb.style));
-  if (document.fonts && document.fonts.load) { try { await document.fonts.load(boothFont(pb.font, 40), 'Aa Đẹp'); } catch {} }
-  return toJpeg(composeBooth(frames, pb, 1200, customFrame));
+function stitch(frames) {
+  const W = 1200, H = 1200, g = 24, foot = 60, top = g, bot = H - foot, cw = (W - 3 * g) / 2;
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const x = cv.getContext('2d'); 
+  
+  if (pb.bgClass) {
+      x.fillStyle = '#ffffff';
+      x.fillRect(0, 0, W, H); 
+  } else {
+      x.fillStyle = pb.color; 
+      x.fillRect(0, 0, W, H);
+  }
+  
+  if (pb.layout === 'grid') {
+    const ch = (bot - top - g) / 2;
+    frames.forEach((f, i) => cover(x, f, g + (i % 2) * (cw + g), top + Math.floor(i / 2) * (ch + g), cw, ch));
+  } else if (pb.layout === 'strip') {
+    const ph = (bot - top - 3 * g) / 4;
+    for (let c = 0; c < 2; c++) frames.forEach((f, i) => cover(x, f, g + c * (cw + g), top + i * (ph + g), cw, ph));
+  } else {
+    const bh = (bot - top - g) * .64, sh = bot - top - g - bh, sw = (W - 4 * g) / 3;
+    cover(x, frames[0], g, top, W - 2 * g, bh);
+    for (let i = 1; i < 4; i++) cover(x, frames[i], g + (i - 1) * (sw + g), top + bh + g, sw, sh);
+  }
+  const d = new Date(), p = n => String(n).padStart(2, '0');
+  x.fillStyle = pb.color === '#111111' ? '#ffffff' : '#222222';
+  x.font = '600 24px system-ui, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.fillText(`${p(d.getDate())}.${p(d.getMonth() + 1)}.${d.getFullYear()}`, W / 2, H - foot / 2);
+  return toJpeg(cv);
 }
 
 /* ============ Màn hình GỬI TỚI ============ */
 let pending = null, pendingUrl = null, pendingVideo = null, pendingVideoUrl = null, sending = false;
-let cap = null; // {mode:'plain'|'preset'|'custom', text, icon, colors, textColor, key}
+let cap = null;
 let sel = { mode: 'all', ids: new Set() };
 
 function pillStyle(c) {
@@ -1646,7 +1230,6 @@ function renderCapPill() {
 
 function openSend(blob, video = null) {
   if (!blob) { toast('Không tạo được ảnh'); return; }
-  $('dualCtl').classList.add('hidden'); $('dualCtl').classList.remove('flex');
   pending = blob; pendingUrl = URL.createObjectURL(blob);
   pendingVideo = video; pendingVideoUrl = video ? URL.createObjectURL(video) : null;
   const vEl = $('sendVid'), iEl = $('sendImg');
@@ -1661,7 +1244,7 @@ function closeSend(force = false) {
   if (pendingUrl) URL.revokeObjectURL(pendingUrl);
   if (pendingVideoUrl) URL.revokeObjectURL(pendingVideoUrl);
   $('sendVid').pause(); $('sendVid').removeAttribute('src');
-  pending = pendingUrl = pendingVideo = pendingVideoUrl = null; dual.a = dual.b = null; $('dualCtl').classList.add('hidden'); $('dualCtl').classList.remove('flex'); hide($('sendView')); closeCaption();
+  pending = pendingUrl = pendingVideo = pendingVideoUrl = null; hide($('sendView')); closeCaption();
 }
 function downloadPending() {
   if (!pending) return;
@@ -1748,7 +1331,7 @@ async function confirmSend() {
   }
   f.is_private = sel.mode === 'private';
   if (sel.mode === 'some') f.recipients = [...sel.ids].join(',');
-  toast(pendingVideo ? 'Đang gửi video lên Locket (có thể mất vài giây)...' : 'Đang gửi lên Locket...', 90000);
+  toast(pendingVideo ? 'Đang gửi video lên Locket...' : 'Đang gửi lên Locket...', 90000);
   try {
     await api('/api/upload', f, pending, pendingVideo);
     toast('✅ Đã gửi lên Locket!'); rememberSent(pending); sending = false; closeSend();
@@ -1776,7 +1359,7 @@ $('uploadFile').addEventListener('change', async e => {
   if (!creds()) { showLogin(); return; }
   try {
     if (file.type.startsWith('video/')) {
-      if (file.size > 4.2 * 1024 * 1024) { toast('Video lớn hơn 4MB nên máy chủ không nhận được. Hãy chọn video ngắn hơn hoặc quay trực tiếp.', 6000); return; }
+      if (file.size > 4.2 * 1024 * 1024) { toast('Video lớn hơn 4MB nên máy chủ không nhận được.', 6000); return; }
       openSend(await videoThumb(file), file); return;
     }
     const bmp = await createImageBitmap(file), s = Math.min(1, 1440 / Math.max(bmp.width, bmp.height));
@@ -1786,17 +1369,11 @@ $('uploadFile').addEventListener('change', async e => {
   } catch { toast('❌ Không đọc được tệp này', 4000); }
 });
 
-/* ============ Các trang mới ============ */
-const fmtTime = v => { const d = new Date(v); return isNaN(d) ? '' : d.toLocaleString('vi-VN'); };
-let feedPosts = [];
-
-/* ---- Khoảnh khắc: xem từng ảnh như app ---- */
+/* ============ Khoảnh khắc (Feed) ============ */
+let feedPosts = [], allItems = [], allLimit = 30, convs = null, curConv = null;
 let feedView = [], feedIdx = 0;
 const postUid = p => typeof p.user === 'string' ? p.user : (p.user && p.user.uid) || p.user_uid || '';
 const postId = p => p.canonical_uid || p.id || p.moment_uid || '';
-// "Ẩn khỏi feed" lưu ngay trên máy này (Locket không có API ẩn ảnh)
-let hiddenIds = new Set(); try { hiddenIds = new Set(JSON.parse(localStorage.getItem('locket_hidden') || '[]')); } catch {}
-const notHidden = p => !hiddenIds.has(postId(p));
 function postTime(p) {
   const v = p.date ?? p.created_at ?? p.createdAt ?? p.timestamp ?? p.time;
   if (v == null) return null;
@@ -1827,12 +1404,11 @@ async function loadFeed(force = false) {
   try {
     const [d] = await Promise.all([api('/api/feed', { user_uid: key, limit: key ? 40 : 60, per: 3 }), getFriends().catch(() => [])]);
     if (key !== feedUser) return;
-    feedCache[key] = (d.posts || []).filter(notHidden).slice().sort((a, b) => (postTime(b) || 0) - (postTime(a) || 0));
+    feedCache[key] = (d.posts || []).slice().sort((a, b) => (postTime(b) || 0) - (postTime(a) || 0));
     feedMeta[key] = { per: 3, more: key ? !!d.next : !!d.more, next: d.next || null };
     feedPosts = feedView = feedCache[key]; feedIdx = 0; buildFeedMenu(); renderMoment();
   } catch (e) { st.textContent = '❌ ' + e.message; }
 }
-// Lướt gần cuối thì tải thêm (thêm bài cũ hơn của từng bạn)
 async function feedLoadMore() {
   const key = feedUser, meta = feedMeta[key];
   if (feedLoading || !meta || !meta.more) return; feedLoading = true;
@@ -1840,16 +1416,15 @@ async function feedLoadMore() {
     const d = await api('/api/feed', key ? { user_uid: key, limit: 30, after: meta.next || '' } : { limit: 150, per: meta.per + 3 });
     if (key !== feedUser) return;
     const have = new Set(feedView.map(postId));
-    const fresh = (d.posts || []).filter(p => notHidden(p) && !have.has(postId(p))).sort((a, b) => (postTime(b) || 0) - (postTime(a) || 0));
+    const fresh = (d.posts || []).filter(p => !have.has(postId(p))).sort((a, b) => (postTime(b) || 0) - (postTime(a) || 0));
     if (key) { meta.next = d.next || null; meta.more = !!d.next && fresh.length > 0; } else { meta.per += 3; meta.more = !!d.more && fresh.length > 0; }
     if (!fresh.length) return;
     const base = feedView.length; feedView = feedCache[key] = feedView.concat(fresh); feedPosts = feedView;
     $('feedScroll').insertAdjacentHTML('beforeend', fresh.map((p, k) => feedItem(p, base + k)).join(''));
     $('feedScroll').querySelectorAll('.feed-item').forEach(el => { if (+el.dataset.i >= base) feedObs.observe(el); });
     updateFeedCount();
-  } catch { /* lần sau thử lại */ } finally { feedLoading = false; }
+  } catch { } finally { feedLoading = false; }
 }
-// Danh sách TẤT CẢ bạn bè (không chỉ những người có ảnh trong feed)
 function buildFeedMenu() {
   const fr = (friends || []).slice().sort((a, b) => fName(a).localeCompare(fName(b), 'vi'));
   const row = (uid, inner, name, on) => `<button onclick="pickFeedUser('${esc(uid)}')" class="w-full flex items-center gap-3 px-3 py-3 text-left hover:bg-white/5">
@@ -1878,29 +1453,55 @@ function feedGo(i) {
 }
 const feedStep = d => feedGo(feedIdx + d);
 
+function toggleVideoMute(i, event) {
+  event.stopPropagation();
+  const vid = $('vid' + i), icon = $('mute-icon' + i);
+  if (!vid) return;
+  vid.muted = !vid.muted;
+  if (vid.muted) {
+    icon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>`;
+  } else {
+    icon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>`;
+  }
+}
+    
 function feedItem(p, i) {
   const a = authorOf(p), img = safeUrl(p.thumbnail_url || p.image_url), vid = safeUrl(p.video_url);
-  const media = vid ? videoTag(vid, img, 'w-full h-full object-cover', 'muted loop playsinline preload="metadata"')
-    : img ? `<img src="${esc(img)}" loading="lazy" class="w-full h-full object-cover" alt="">` : '';
+  const media = vid ? `
+    <div class="relative w-full h-full bg-black group overflow-hidden">
+      <video id="vid${i}" src="${esc(vid)}" poster="${esc(img)}" loop muted playsinline webkit-playsinline preload="metadata" class="w-full h-full object-cover"></video>
+      <button onclick="toggleVideoMute(${i}, event)" class="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-black/50 backdrop-blur text-white flex items-center justify-center hover:bg-black/70 transition">
+        <svg id="mute-icon${i}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <line x1="23" y1="9" x2="17" y2="15"></line>
+          <line x1="17" y1="9" x2="23" y2="15"></line>
+        </svg>
+      </button>
+    </div>` : img ? `<img src="${esc(img)}" loading="lazy" class="w-full h-full object-cover" alt="">` : '';
+    
   const c = postCaption(p), label = `${c.icon ? c.icon + ' ' : ''}${c.text}`.trim();
-  const cap = label ? `<div class="absolute bottom-4 left-1/2 -translate-x-1/2 max-w-[88%] truncate rounded-full px-4 py-1.5 text-[13px] font-semibold backdrop-blur" style="${pillStyle(c)}">${esc(label)}</div>` : '';
+  const cap = label ? `<div class="absolute bottom-4 left-1/2 -translate-x-1/2 max-w-[88%] truncate rounded-full px-4 py-1.5 text-[13px] font-semibold backdrop-blur z-10" style="${pillStyle(c)}">${esc(label)}</div>` : '';
+  
   return `<section class="feed-item" data-i="${i}" style="height:100%;scroll-snap-align:start;scroll-snap-stop:always;display:flex;align-items:center;justify-content:center;padding:24px">
     <div class="flex flex-col items-center" style="width:min(100%,calc(100vh - 230px),560px)">
       <div class="relative w-full aspect-square overflow-hidden bg-zinc-900" style="border-radius:9%">${media}${cap}</div>
       <div class="flex items-center justify-center gap-2 mt-3 w-full">
-        <div class="flex items-center gap-2 min-w-0">${avatarHtml(a, 'w-6 h-6 text-[10px]')}<span class="text-[13px] font-semibold truncate">${esc(fName(a))}</span><span class="text-xs text-zinc-500 shrink-0">${esc(ago(postTime(p)))}</span></div>
-        <button onclick="openPostMenu(${i})" class="text-zinc-400 hover:text-white p-1" title="Tùy chọn">${DOTS_SVG}</button>
+        <div class="flex items-center gap-2 min-w-0">
+          ${avatarHtml(a, 'w-6 h-6 text-[10px]')}
+          <span class="text-[13px] font-semibold truncate">${esc(fName(a))}</span>
+          <span class="text-xs text-zinc-500 shrink-0">${esc(ago(postTime(p)))}</span>
+        </div>
+        <button onclick="openPostMedia(${i})" class="text-zinc-400 hover:text-white" title="Mở ảnh">${DOTS_SVG}</button>
       </div>
       <div class="relative mt-3 w-full flex items-center gap-0.5 bg-white/10 rounded-full pl-4 pr-1.5 py-1">
         <input id="fm${i}" maxlength="300" placeholder="Gửi tin nhắn..." onkeydown="if(event.key==='Enter')sendFeedMsg(${i})" class="flex-1 min-w-0 bg-transparent outline-none text-[13px] placeholder-zinc-500">
         ${['💛', '🔥', '😍'].map(e => `<button onclick="reactEmoji(${i},'${e}')" class="w-8 h-8 text-lg hover:scale-110 transition">${e}</button>`).join('')}
         <button onclick="document.getElementById('ep${i}').classList.toggle('hidden')" class="w-8 h-8 text-zinc-300 hover:text-white flex items-center justify-center" title="Thêm cảm xúc">${SMILE_SVG}</button>
-        <div id="ep${i}" class="hidden absolute bottom-full right-0 mb-2 bg-[#2a2a2d] rounded-2xl p-2 flex-wrap w-44 gap-0.5 shadow-xl">${MORE_EMO.map(e => `<button onclick="reactEmoji(${i},'${e}')" class="w-9 h-9 text-xl hover:scale-110 transition">${e}</button>`).join('')}</div>
+        <div id="ep${i}" class="hidden absolute bottom-full right-0 mb-2 bg-[#2a2a2d] rounded-2xl p-2 flex-wrap w-44 gap-0.5 shadow-xl z-20">${MORE_EMO.map(e => `<button onclick="reactEmoji(${i},'${e}')" class="w-9 h-9 text-xl hover:scale-110 transition">${e}</button>`).join('')}</div>
       </div>
     </div></section>`;
 }
 
-// Dựng danh sách bài, lướt dọc từng bài (scroll-snap), tự phát video của bài đang xem
 function renderMoment() {
   const st = $('feedStatus'), sc = $('feedScroll');
   if (feedObs) feedObs.disconnect();
@@ -1910,54 +1511,35 @@ function renderMoment() {
   }
   st.classList.add('hidden'); $('feedNav').classList.remove('hidden');
   sc.innerHTML = feedView.map(feedItem).join(''); sc.scrollTop = 0; feedIdx = 0; updateFeedCount();
+  
+  const forcePlay = (video) => {
+    if (!video) return;
+    video.muted = true;
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        video.load(); 
+        setTimeout(() => video.play().catch(()=>{}), 500);
+      });
+    }
+  };
+
   feedObs = new IntersectionObserver(es => es.forEach(en => {
     const v = en.target.querySelector('video');
-    if (en.isIntersecting) { feedIdx = +en.target.dataset.i; updateFeedCount(); if (v) safePlay(v); if (feedIdx >= feedView.length - 3) feedLoadMore(); }
-    else if (v) v.pause();
-  }), { root: sc, threshold: .6 });
+    if (en.isIntersecting) { 
+      feedIdx = +en.target.dataset.i; 
+      updateFeedCount(); 
+      if (v) forcePlay(v);
+      if (feedIdx >= feedView.length - 3) feedLoadMore(); 
+    }
+    else if (v) { v.pause(); }
+  }), { root: sc, threshold: 0.6 });
+  
   sc.querySelectorAll('.feed-item').forEach(el => feedObs.observe(el));
+  setTimeout(() => { forcePlay(sc.querySelector('.feed-item video')); }, 500);
 }
-let postMenuIdx = -1;
-const openPostMenu = i => { postMenuIdx = i; show($('postSheet')); };
-const closePostMenu = () => hide($('postSheet'));
-const postUrl = p => safeUrl(p.video_url || p.thumbnail_url || p.image_url);
-async function postShare() {
-  const p = feedView[postMenuIdx]; closePostMenu(); const url = p && postUrl(p); if (!url) return;
-  if (navigator.share) { try { await navigator.share({ title: 'Locket', text: 'Khoảnh khắc của ' + fName(authorOf(p)), url }); } catch {} return; }
-  copyText(url);
-}
-// Tải về: thử trực tiếp, nếu bị chặn thì tải từng đoạn qua máy chủ
-async function blobDirect(url) { const r = await fetch(url); if (!r.ok) throw new Error('HTTP ' + r.status); return r.blob(); }
-async function blobProxy(url) {
-  const parts = []; let start = 0, total = Infinity, type = '';
-  while (start < total) {
-    const r = await fetch('/api/media?u=' + encodeURIComponent(url), { headers: { Range: `bytes=${start}-` } });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    type = type || r.headers.get('Content-Type') || ''; parts.push(await r.arrayBuffer());
-    const m = /bytes (\d+)-(\d+)\/(\d+)/.exec(r.headers.get('Content-Range') || '');
-    if (r.status === 206 && m) { start = +m[2] + 1; total = +m[3]; } else break;
-  }
-  return new Blob(parts, { type });
-}
-async function postDownload() {
-  const p = feedView[postMenuIdx]; closePostMenu(); const url = p && postUrl(p); if (!url) return;
-  const isVid = !!safeUrl(p.video_url), name = `locket-${(fName(authorOf(p)) || 'moment').replace(/[^\w\-]+/g, '_')}-${Date.now()}.${isVid ? 'mp4' : 'jpg'}`;
-  toast('Đang tải về...', 30000);
-  try {
-    let blob; try { blob = await blobDirect(url); } catch { blob = await blobProxy(url); }
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 8000); toast('✅ Đã tải về');
-  } catch (e) { toast('❌ Không tải được: ' + e.message, 5000); }
-}
-function postHide() {
-  const p = feedView[postMenuIdx], i = postMenuIdx; closePostMenu(); if (!p) return;
-  const id = postId(p); if (id) { hiddenIds.add(id); try { localStorage.setItem('locket_hidden', JSON.stringify([...hiddenIds])); } catch {} }
-  Object.values(feedCache).forEach(arr => { for (let k = arr.length - 1; k >= 0; k--) if (postId(arr[k]) === id) arr.splice(k, 1); });
-  feedView = feedCache[feedUser] || feedView.filter(x => postId(x) !== id); feedPosts = feedView;
-  const keep = Math.max(0, Math.min(i, feedView.length - 1)); renderMoment();
-  const sc = $('feedScroll'); sc.scrollTop = keep * sc.clientHeight; feedIdx = keep; if (feedView.length) updateFeedCount();
-  toast('Đã ẩn khỏi feed trên máy này');
-}
+    
+function openPostMedia(i) { const p = feedView[i], u = p && safeUrl(p.video_url || p.thumbnail_url || p.image_url); if (u) window.open(u, '_blank', 'noopener'); }
 async function reactEmoji(i, e) {
   const p = feedView[i], id = p && postId(p);
   if (!id) { toast('Không tìm thấy mã ảnh để thả cảm xúc'); return; }
@@ -1972,26 +1554,204 @@ async function sendFeedMsg(i) {
   try { await api('/api/send_message', { receiver_uid: uid, text: t, moment_uid: postId(p) }); inp.value = ''; toast('✅ Đã gửi tin nhắn'); }
   catch (e) { toast('❌ ' + e.message, 4000); } finally { inp.disabled = false; inp.focus(); }
 }
-document.addEventListener('keydown', e => {
-  if ($('view-feed').classList.contains('hidden') || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
-  if (['ArrowDown', 'ArrowRight', 'PageDown'].includes(e.key)) { e.preventDefault(); feedStep(1); }
-  else if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); feedStep(-1); }
-});
-// Kéo chuột lên/xuống để lướt (cảm ứng và con lăn đã tự lướt được)
-(() => {
-  let y0 = null; const sc = $('feedScroll');
-  sc.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse' && !e.target.closest('input,button,select')) y0 = e.clientY; });
-  window.addEventListener('pointerup', e => { if (y0 == null) return; const dy = e.clientY - y0; y0 = null; if (Math.abs(dy) > 60) feedStep(dy < 0 ? 1 : -1); });
-})();
 
-/* ---- Cài đặt giao diện (lưu trên máy này) ---- */
+/* ---- Tất cả ảnh ---- */
+let allUser = '', allCache = {}, allNext = null, allLoading = false, lbIdx = -1, allPer = 3;
+const allMine = () => allUser === 'me';
+async function loadAll(force = false) {
+  const key = allUser;
+  if (!force && allCache[key]) { allItems = allCache[key].items; allNext = allCache[key].next; renderGrid(); return; }
+  allItems = []; allNext = null; allPer = 3; allCache[key] = null; $('allGrid').innerHTML = ''; $('allStatus').textContent = 'Đang tải...';
+  await fetchMoreAll(true);
+}
+async function fetchMoreAll(first = false) {
+  if (allLoading) return; allLoading = true; const key = allUser;
+  try {
+    let items, next = null;
+    if (key === 'me') {
+      const want = first ? 30 : allItems.length + 30;
+      items = (await api('/api/my_moments', { limit: want })).moments || []; next = items.length >= want ? 'more' : null;
+    } else if (key) {
+      const [d] = await Promise.all([api('/api/feed', { user_uid: key, limit: 30, after: allNext || '' }), getFriends().catch(() => [])]);
+      const have = new Set(allItems.map(postId)); items = allItems.concat((d.posts || []).filter(p => !have.has(postId(p)))); next = d.next || null;
+    } else {
+      const per = first ? 3 : allPer + 3;
+      const [d] = await Promise.all([api('/api/feed', { limit: 150, per }), getFriends().catch(() => [])]);
+      items = (d.posts || []).slice().sort((a, b) => (postTime(b) || 0) - (postTime(a) || 0));
+      next = d.more && (first || items.length > allItems.length) ? 'more' : null;
+      if (key === allUser && !first) allPer = per;
+    }
+    if (key !== allUser) return;
+    allItems = items; allNext = next; allCache[key] = { items, next }; buildUserMenu('allMenu', allUser, 'pickAllUser', true); renderGrid();
+  } catch (e) { if (first) $('allStatus').textContent = '❌ ' + e.message; else toast('❌ ' + e.message, 4000); }
+  finally { allLoading = false; }
+}
+function renderGrid() {
+  $('allStatus').textContent = allItems.length ? '' : (allMine() ? 'Bạn chưa đăng ảnh nào.' : 'Chưa có ảnh nào.');
+  $('allGrid').innerHTML = allItems.map((m, i) => {
+    const u = safeUrl(m.thumbnail_url || m.image_url), vid = !!safeUrl(m.video_url);
+    return `<button onclick="openMoment(${i})" class="relative aspect-square overflow-hidden bg-zinc-800 group" style="border-radius:11%">
+      ${u ? `<img src="${esc(u)}" loading="lazy" class="w-full h-full object-cover" alt="">` : ''}
+      ${vid ? `<div class="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition">
+            <span class="w-10 h-10 rounded-full bg-black/50 backdrop-blur flex items-center justify-center text-white">${PLAY_ICON}</span>
+        </div>` : ''}</button>`;
+  }).join('');
+}
+function buildUserMenu(menuId, current, fn, withMe) {
+  const fr = (friends || []).slice().sort((a, b) => fName(a).localeCompare(fName(b), 'vi'));
+  const row = (uid, inner, name) => `<button onclick="${fn}('${esc(uid)}')" class="w-full flex items-center gap-3 px-3 py-3 text-left hover:bg-white/5">
+    <span class="shrink-0">${inner}</span><span class="flex-1 truncate text-[14px] font-semibold ${current === uid ? 'text-yellow-400' : ''}">${esc(name)}</span><span class="text-zinc-400">${CHEV_R}</span></button>`;
+  const ico = svg => `<div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">${svg}</div>`;
+  $(menuId).innerHTML = row('', ico(`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.7a3.5 3.5 0 0 1 0 6.6M18.5 14.6c1.8.8 3 2.6 3 5.4"/></svg>`), 'Tất cả bạn bè') + (withMe ? row('me', ico(`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="8" r="4"/><path d="M4.5 21c0-4 3.4-6.5 7.5-6.5s7.5 2.5 7.5 6.5"/></svg>`), 'Ảnh của tôi') : '')
+    + fr.map(f => row(f.uid, avatarHtml(f, 'w-10 h-10'), fName(f))).join('');
+}
+async function toggleAllMenu() { if (!friends) await getFriends().catch(() => {}); buildUserMenu('allMenu', allUser, 'pickAllUser', true); $('allMenu').classList.toggle('hidden'); }
+function pickAllUser(uid) {
+  allUser = uid; $('allMenu').classList.add('hidden');
+  const f = (friends || []).find(x => x.uid === uid);
+  $('allFilterLabel').textContent = uid === 'me' ? 'Ảnh của tôi' : uid ? fName(f || {}) : 'Tất cả bạn bè';
+  loadAll();
+}
+function openMoment(i) {
+  const m = allItems[i]; if (!m) return; lbIdx = i;
+  const vid = safeUrl(m.video_url), img = safeUrl(m.thumbnail_url || m.image_url), mine = allMine();
+  if (vid) {
+      $('lbMedia').innerHTML = `<video src="${esc(vid)}" poster="${esc(img)}" controls autoplay loop playsinline class="w-full aspect-square object-contain bg-black rounded-2xl"></video>`;
+  } else {
+      $('lbMedia').innerHTML = `<img src="${esc(img)}" class="w-full aspect-square object-contain bg-black rounded-2xl" alt="">`;
+  }
+  const c = postCaption(m); $('lbCap').textContent = `${c.icon ? c.icon + ' ' : ''}${c.text}`.trim();
+  const t = postTime(m), when = t ? new Date(t).toLocaleString('vi-VN') : '';
+  $('lbInfo').textContent = mine ? `👁 ${m.views_count || 0} lượt xem · ❤️ ${(m.reactions || []).length} cảm xúc · ${when}` : `${fName(authorOf(m))} · ${when}`;
+  $('lbDel').classList.toggle('hidden', !mine); show($('lightbox'));
+}
+function closeMoment() { $('lbMedia').innerHTML = ''; hide($('lightbox')); }
+async function deleteMoment() {
+  const m = allItems[lbIdx]; if (!m || !confirm('Xóa ảnh này khỏi Locket?')) return;
+  try { await api('/api/delete_moment', { moment_uid: m.moment_uid }); toast('Đã xóa ảnh'); closeMoment(); loadAll(true); }
+  catch (e) { toast('❌ ' + e.message, 4000); }
+}
+
+/* ---- Tin nhắn ---- */
+let meUid = '', myMoments = null;
+const p2 = n => String(n).padStart(2, '0');
+const peerOf = c => (friends || []).find(f => f.uid === c.peer_uid) || { uid: c.peer_uid };
+const msgText = t => (!t || t === '\u200b') ? '📷 Khoảnh khắc' : t;
+function shortTime(v) {
+  const t = Date.parse(v); if (isNaN(t)) return '';
+  const m = Math.floor((Date.now() - t) / 60000); if (m < 60) return Math.max(m, 1) + 'p';
+  const h = Math.floor(m / 60); if (h < 24) return h + 'h';
+  const d = Math.floor(h / 24); if (d < 7) return d + 'd';
+  const dt = new Date(t); return p2(dt.getDate()) + '-' + p2(dt.getMonth() + 1);
+}
+function stamp(v) { const d = new Date(v); return isNaN(d) ? '' : `${p2(d.getDate())}-${p2(d.getMonth() + 1)} ${p2(d.getHours())}:${p2(d.getMinutes())}`; }
+function updateBadge() {
+  const n = (convs || []).reduce((a, c) => a + (c.unread_count || 0), 0), b = $('chatBadge'), bm = $('chatBadgeMobile');
+  if (b) { b.textContent = n; b.classList.toggle('hidden', !n); }
+  if (bm) { bm.textContent = n; bm.classList.toggle('hidden', !n); }
+}
+async function loadConvs(force = false) {
+  if (convs && !force) { renderConvs(); return; }
+  if (!convs) $('convList').innerHTML = '<p class="p-4 text-xs text-zinc-400">Đang tải...</p>';
+  try {
+    const [d] = await Promise.all([api('/api/conversations'), getFriends()]);
+    convs = d.conversations || []; meUid = d.me || meUid; renderConvs(); updateBadge();
+  } catch (e) { $('convList').innerHTML = `<p class="p-4 text-xs text-red-400">❌ ${esc(e.message)}</p>`; }
+}
+function renderConvs() {
+  $('convList').innerHTML = (convs && convs.length) ? convs.map((c, i) => {
+    const f = peerOf(c), un = c.unread_count > 0, lm = c.latest_message || {}, mine = lm.sender_uid && lm.sender_uid === meUid;
+    const on = curConv && curConv.peer_uid === c.peer_uid;
+    return `<button onclick="openChat(${i})" class="w-full flex items-center gap-4 px-3 py-3 rounded-2xl text-left transition ${on ? 'bg-white/10' : 'hover:bg-white/5'}">
+      <div class="w-14 h-14 rounded-full border-2 border-white/10 p-0.5 shrink-0">${avatarHtml(f, 'w-full h-full')}</div>
+      <div class="min-w-0 flex-1"><div class="flex items-center justify-between gap-2"><span class="text-[17px] ${un ? 'font-bold' : 'font-semibold'} truncate">${esc(fName(f))}</span><span class="text-[13px] text-zinc-400 shrink-0">${esc(shortTime(lm.timestamp))}</span></div>
+      <div class="flex items-center gap-2"><span class="text-[15px] truncate flex-1 ${un ? 'text-white' : 'text-zinc-400'}">${lm.text !== undefined ? esc((mine ? 'Bạn: ' : '') + msgText(lm.text)) : ''}</span>${un ? `<span class="bg-yellow-400 text-black text-xs font-bold rounded-full px-2">${c.unread_count}</span>` : ''}</div></div></button>`;
+  }).join('') : '<p class="p-4 text-sm text-zinc-500">Chưa có cuộc trò chuyện nào.</p>';
+}
+function closeChatUI() {
+  curConv = null;
+  show($('chatEmpty'), ''); hide($('chatHead')); hide($('msgList'), ''); hide($('chatInput'));
+  if (convs) renderConvs();
+}
+const openChat = i => openConv(convs[i]);
+async function openConv(c) {
+  curConv = c; renderConvs(); const f = peerOf(c);
+  $('chatTitle').textContent = fName(f); $('chatAvatar').innerHTML = avatarHtml(f, 'w-10 h-10');
+  hide($('chatEmpty'), ''); show($('chatHead')); show($('msgList'), ''); show($('chatInput'));
+  const box = $('msgList');
+  if (!c.conversation_id) { box.innerHTML = '<p class="text-center text-xs text-zinc-500 py-6">Hãy gửi tin nhắn đầu tiên.</p>'; $('msgInput').focus(); return; }
+  box.innerHTML = '<p class="text-xs text-zinc-400">Đang tải...</p>';
+  try {
+    const d = await api('/api/messages', { conversation_id: c.conversation_id });
+    if (curConv !== c) return; drawMsgs(d.messages || []);
+    if (c.unread_count > 0) {
+      c.unread_count = 0; updateBadge(); renderConvs();
+      api('/api/mark_read', { conversation_id: c.conversation_id, peer_uid: c.peer_uid || '', ghost: $('ghost').checked }).catch(() => {});
+    }
+  } catch (e) { box.innerHTML = `<p class="text-xs text-red-400">❌ ${esc(e.message)}</p>`; }
+}
+async function openChatWith(uid) {
+  showView('chat'); await loadConvs();
+  let c = (convs || []).find(x => x.peer_uid === uid);
+  if (!c) { c = { conversation_id: null, peer_uid: uid, unread_count: 0, latest_message: {} }; convs = [c, ...(convs || [])]; }
+  openConv(c);
+}
+function momentThumb(id) {
+  if (!id) return '';
+  const pool = [...allItems, ...Object.values(feedCache).flat(), ...(myMoments || [])];
+  const x = pool.find(p => p && (postId(p) === id || p.moment_uid === id)); return x ? (x.thumbnail_url || x.image_url) : '';
+}
+function bubble(m) {
+  const img = safeUrl(m.image_url) || safeUrl(momentThumb(m.moment_uid)), txt = (m.text && m.text !== '\u200b') ? m.text : '', side = m.is_me ? 'items-end' : 'items-start';
+  const pill = t => `<div class="max-w-[75%] rounded-3xl px-4 py-2 text-[15px] break-words ${m.is_me ? 'bg-[#f7b84b] text-black' : 'bg-zinc-800'}">${t}</div>`;
+  return `<div class="flex flex-col ${side} gap-1">${img ? `<img src="${esc(img)}" loading="lazy" class="w-44 h-44 object-cover rounded-3xl" alt="">` : ''}
+    ${txt ? pill(esc(txt)) : (!img ? pill('📷 Khoảnh khắc') : '')}${(m.reactions || []).length ? `<div class="text-sm">${esc(m.reactions.join(' '))}</div>` : ''}</div>`;
+}
+function drawMsgs(list) {
+  const box = $('msgList'); let h = '', last = 0;
+  list.forEach(m => { const t = Date.parse(m.timestamp) || 0; if (!last || t - last > 30 * 60000) h += `<div class="text-center text-xs text-zinc-500 py-2">${stamp(m.timestamp)}</div>`; last = t; h += bubble(m); });
+  box.innerHTML = h || '<p class="text-center text-xs text-zinc-500 py-6">Chưa có tin nhắn.</p>'; box.scrollTop = box.scrollHeight;
+}
+function appendMsg(m) {
+  const box = $('msgList'); if (box.querySelector('p')) box.innerHTML = '';
+  box.insertAdjacentHTML('beforeend', bubble(m)); box.scrollTop = box.scrollHeight;
+}
+function msgInputChange() {
+  const on = $('msgInput').value.trim().length > 0, b = $('sendMsgBtn');
+  b.style.background = on ? '#f7b84b' : '#6b5320'; b.style.color = on ? '#000' : 'rgba(0,0,0,.6)';
+}
+async function afterFirstMessage() {
+  if (curConv && !curConv.conversation_id) {
+    const uid = curConv.peer_uid; await loadConvs(true);
+    const c = convs.find(x => x.peer_uid === uid); if (c) { curConv = c; renderConvs(); }
+  }
+}
+async function sendMsg() {
+  const inp = $('msgInput'), text = inp.value.trim();
+  if (!text || !curConv || !curConv.peer_uid) return;
+  inp.value = ''; msgInputChange(); inp.disabled = true;
+  try {
+    await api('/api/send_message', { receiver_uid: curConv.peer_uid, text });
+    appendMsg({ is_me: true, text, timestamp: new Date().toISOString() }); afterFirstMessage();
+  } catch (e) { inp.value = text; msgInputChange(); toast('❌ ' + e.message, 4000); }
+  finally { inp.disabled = false; inp.focus(); }
+}
+function openNewChat() { $('pickQ').value = ''; renderPick(); show($('pickModal')); getFriends().then(renderPick).catch(() => {}); }
+function renderPick() {
+  const q = $('pickQ').value.trim().toLowerCase();
+  const fr = (friends || []).filter(f => !q || fName(f).toLowerCase().includes(q) || (f.username || '').toLowerCase().includes(q)).sort((a, b) => fName(a).localeCompare(fName(b), 'vi'));
+  $('pickList').innerHTML = fr.length ? fr.map(f => `<button onclick="hide($('pickModal'));openChatWith('${esc(f.uid)}')" class="w-full flex items-center gap-3 px-2 py-2.5 rounded-xl text-left hover:bg-white/5">${avatarHtml(f, 'w-10 h-10')}<span class="text-[15px] font-medium truncate">${esc(fName(f))}</span></button>`).join('') : '<p class="text-xs text-zinc-400 p-2">Không tìm thấy bạn bè.</p>';
+}
+
+/* ---- Cài đặt giao diện & Hồ sơ ---- */
 const THEMES = { default: ['Mặc định', '#2a2a2d'], gold: ['Gold', '#b8892a'], rose: ['Hồng', '#c2547a'], ocean: ['Xanh biển', '#2a7fa8'] };
 const STYLES = { dac: 'Kiểu đậm', manh: 'Kiểu mảnh' };
-let settings = { theme: 'default', style: 'dac', showSwitch: true };
+let settings = { theme: 'default', style: 'dac', showCard: true, showSwitch: true };
 try { Object.assign(settings, JSON.parse(localStorage.getItem('locket_settings') || '{}')); } catch {}
 function applySettings() {
   document.body.dataset.theme = settings.theme; document.body.classList.toggle('manh', settings.style === 'manh');
-  $('navAcc').classList.toggle('hidden', !settings.showSwitch);
+  if ($('navCard')) $('navCard').classList.toggle('hidden', !settings.showCard); 
+  if ($('navAcc')) $('navAcc').classList.toggle('hidden', !settings.showSwitch);
 }
 function saveSettings() { try { localStorage.setItem('locket_settings', JSON.stringify(settings)); } catch {} applySettings(); }
 function toggleSetting(k) { settings[k] = !settings[k]; saveSettings(); renderProfile(); }
@@ -2003,7 +1763,6 @@ const openTheme = () => { renderTheme(); show($('themeModal')); };
 function setTheme(k) { settings.theme = k; saveSettings(); renderTheme(); renderProfile(); }
 function setStyle(k) { settings.style = k; saveSettings(); renderTheme(); renderProfile(); }
 
-/* ---- Hồ sơ ---- */
 let profileData = null, deferredInstall = null;
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; });
 async function installApp() {
@@ -2013,7 +1772,6 @@ function shareInvite() {
   const link = inviteLink();
   if (navigator.share) navigator.share({ title: 'Locket', text: 'Kết bạn với mình trên Locket nhé!', url: link }).catch(() => {}); else copyText(link);
 }
-function copyText(t) { navigator.clipboard.writeText(t).then(() => toast('Đã chép'), () => toast('Không chép được')); }
 const pfRow = (icon, title, sub, right = '', click = '') => `<div ${click ? `onclick="${click}"` : ''} class="flex items-center gap-4 py-3.5 ${click ? 'cursor-pointer' : ''}">
   <span class="text-zinc-300 w-6 flex justify-center">${icon}</span><div class="flex-1 min-w-0"><div class="text-[16px] font-medium truncate">${title}</div>${sub ? `<div class="text-[13px] text-zinc-500 truncate">${sub}</div>` : ''}</div>${right}</div>`;
 const pfSwitch = k => `<button onclick="event.stopPropagation();toggleSetting('${k}')" class="w-14 h-8 rounded-full relative shrink-0 transition ${settings[k] ? 'bg-yellow-400' : 'bg-zinc-600'}"><span class="absolute top-1 w-6 h-6 rounded-full bg-white transition-all ${settings[k] ? 'left-7' : 'left-1'}"></span></button>`;
@@ -2039,6 +1797,7 @@ function renderProfile() {
       <button onclick="shareInvite()" class="text-white p-2" title="Chia sẻ link mời"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="6" cy="12" r="2.5" fill="currentColor"/><circle cx="18" cy="6" r="2.5" fill="currentColor"/><circle cx="18" cy="18" r="2.5" fill="currentColor"/><path d="m8.2 10.8 7.6-3.6M8.2 13.2l7.6 3.6"/></svg></button></div>
     ${pfH('Ứng dụng')}${pfRow(`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><rect x="4" y="4" width="16" height="16" rx="3.5" fill="currentColor" stroke="none"/><path d="M12 8v8M8 12h8" stroke="#18181b" stroke-width="2"/></svg>`, 'Cài ứng dụng vào máy', '', '', 'installApp()')}${pfRow(`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="9.5" fill="currentColor" stroke="none"/><path d="M9.6 9.6a2.5 2.5 0 1 1 3.4 2.3c-.7.4-1 .9-1 1.6" stroke="#18181b" stroke-width="2"/><circle cx="12" cy="17" r="1.1" fill="#18181b" stroke="none"/></svg>`, 'Cách cài ứng dụng', '', '', "show($('howModal'))")}
     ${pfH('Giao diện')}${pfRow(`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.7 1.6-1.5 0-1-.8-1.4-.8-2.3 0-.8.7-1.4 1.6-1.4H16a5 5 0 0 0 5-5c0-4-4-7.8-9-7.8z" fill="currentColor" stroke="none"/></svg>`, 'Chủ đề &amp; kiểu giao diện', `${THEMES[settings.theme][0]} · ${STYLES[settings.style]}`, '', 'openTheme()')}
+    ${pfRow(`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><rect x="4" y="3.5" width="16" height="17" rx="3.2" fill="currentColor" stroke="none"/><path d="M12 16s-3-1.9-3-4.2a1.7 1.7 0 0 1 3-1.1 1.7 1.7 0 0 1 3 1.1c0 2.3-3 4.2-3 4.2z" fill="#18181b" stroke="none"/></svg>`, 'Nút làm thiệp online', 'Hiện trên thanh menu', pfSwitch('showCard'))}
     ${pfRow(`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="9" cy="8" r="3.5" fill="currentColor" stroke="none"/><path d="M2.5 20.5c0-3.6 2.9-6 6.5-6 1.1 0 2.1.2 3 .6"/><path d="M15 17.5h6m0 0-2-2m2 2-2 2"/></svg>`, 'Nút chuyển tài khoản', 'Hiện trên thanh menu', pfSwitch('showSwitch'))}
     ${pfH('Chung')}${pfRow(`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="9" cy="8" r="3.5" fill="currentColor" stroke="none"/><path d="M2.5 20.5c0-3.6 2.9-6 6.5-6 1.1 0 2.1.2 3 .6"/><path d="M15 17.5h6m0 0-2-2m2 2-2 2"/></svg>`, 'Chuyển tài khoản', 'Các tài khoản đã lưu trên máy này', '', 'openAccounts()')}
     ${pfRow(`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><rect x="3" y="5" width="18" height="14" rx="3" fill="currentColor" stroke="none"/><circle cx="9" cy="11" r="2" fill="#18181b" stroke="none"/><path d="M6.5 16c.6-1.5 1.5-2 2.5-2s1.9.5 2.5 2M14 10h4M14 13h3" stroke="#18181b"/></svg>`, 'Sửa tên', esc(name), '', "$('nameEditor').classList.toggle('hidden')")}
@@ -2071,15 +1830,9 @@ async function changeAvatar(inp) {
   } catch (e) { toast('❌ ' + e.message, 4000); }
 }
 
-/* ---- Ủng hộ & Làm thiệp: ĐIỀN THÔNG TIN CỦA BẠN Ở ĐÂY ---- */
 const SITE = {
-  donate: {
-    intro: 'Mỗi khoản ủng hộ giúp duy trì máy chủ và làm thêm tính năng mới.',
-    linkLabel: '', linkUrl: '',            // ví dụ: 'Theo dõi TikTok', 'https://tiktok.com/@ten-cua-ban'
-    qrUrl: '',                             // link ảnh mã QR chuyển khoản (https://...)
-    bank: '', account: '', owner: '', note: '',
-    donors: []                             // ví dụ: ['Nguyễn A', 'Ẩn danh']
-  },
+  donate: { intro: 'Mỗi khoản ủng hộ giúp duy trì máy chủ.', linkLabel: '', linkUrl: '', qrUrl: '', bank: '', account: '', owner: '', note: '', donors: [] },
+  card: { url: '', desc: 'Tạo thiệp online để gửi cho bạn bè.' }  
 };
 function renderDonate() {
   const d = SITE.donate, qr = safeUrl(d.qrUrl), link = safeUrl(d.linkUrl);
@@ -2087,12 +1840,14 @@ function renderDonate() {
   const has = qr || d.bank || d.account;
   $('donateBody').innerHTML = `<h2 class="text-xl font-bold text-center">Ủng hộ 💛</h2><p class="text-sm text-zinc-400 text-center mt-1 mb-4">${esc(d.intro)}</p>
     ${link ? `<a href="${esc(link)}" target="_blank" rel="noopener" class="block text-center bg-zinc-800 border border-zinc-700 rounded-xl py-3 text-sm font-semibold mb-4">${esc(d.linkLabel || link)}</a>` : ''}
-    ${has ? `<div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">${qr ? `<img src="${esc(qr)}" class="w-56 h-56 object-contain bg-white rounded-xl mx-auto mb-3" alt="QR">` : ''}${row('Ngân hàng', d.bank)}${row('Số tài khoản', d.account)}${row('Chủ tài khoản', d.owner)}${row('Nội dung', d.note)}</div>`
-         : '<p class="text-sm text-zinc-500 text-center">Chưa có thông tin ủng hộ. Mở file <code>index.html</code>, tìm <code>const SITE</code> để điền.</p>'}
-    ${d.donors.length ? `<h3 class="font-semibold mt-6 mb-2 text-sm">Danh sách ủng hộ</h3><ol class="space-y-1 text-sm">${d.donors.map((n, i) => `<li class="bg-zinc-900 rounded-xl px-3 py-2">${i + 1}. ${esc(n)}</li>`).join('')}</ol>` : ''}`;
+    ${has ? `<div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">${qr ? `<img src="${esc(qr)}" class="w-56 h-56 object-contain bg-white rounded-xl mx-auto mb-3" alt="QR">` : ''}${row('Ngân hàng', d.bank)}${row('Số tài khoản', d.account)}${row('Chủ tài khoản', d.owner)}${row('Nội dung', d.note)}</div>` : ''}`;
+}
+function renderCard() {
+  const c = SITE.card, u = safeUrl(c.url);
+  $('cardBody').innerHTML = `<h2 class="text-xl font-bold mb-2">Làm thiệp online 💌</h2><p class="text-sm text-zinc-400 mb-4">${esc(c.desc)}</p>
+    ${u ? `<a href="${esc(u)}" target="_blank" rel="noopener" class="block text-center bg-yellow-400 text-black font-bold rounded-xl py-3">Mở trang làm thiệp</a>` : '<p class="text-sm text-zinc-500">Chưa cấu hình link.</p>'}`;
 }
 
-/* ============ Ảnh vừa đăng trên nút thư viện ============ */
 const lastKey = () => 'locket_last_' + ((creds() || {}).email || '');
 function setLastThumb(url) { $('galBtn').style.backgroundImage = url ? `url("${String(url).replace(/"/g, '%22')}")` : ''; }
 async function loadLastThumb() {
@@ -2111,29 +1866,22 @@ async function rememberSent(blob) {
   } catch {}
 }
 
-/* ============ Cuộn chuột / vuốt: Đăng ảnh <-> Khoảnh khắc (Lịch sử) ============ */
-let navLock = 0;
-const overlaysOpen = () => ['sendView', 'fxSheet', 'faceSheet', 'recSheet', 'pbModal', 'loginModal', 'accModal', 'themeModal', 'howModal', 'postSheet'].some(id => !$(id).classList.contains('hidden'));
-const canNavigate = () => !busy && !overlaysOpen() && Date.now() >= navLock;
-const lockNav = () => { navLock = Date.now() + 900; };
-$('view-upload').addEventListener('wheel', e => { if (e.deltaY > 30 && canNavigate()) { lockNav(); showView('feed'); } }, { passive: true });
-$('feedScroll').addEventListener('wheel', e => {
-  if (Date.now() < navLock) { e.preventDefault(); return; }   // chặn quán tính của lần cuộn vừa chuyển trang
-  if (e.deltaY < -30 && feedIdx === 0 && $('feedScroll').scrollTop <= 2 && canNavigate()) { lockNav(); showView('upload'); }
-}, { passive: false });
-(() => {   // vuốt lên trên điện thoại ở trang Đăng ảnh
-  let y0 = null, tgt = null; const v = $('view-upload');
-  v.addEventListener('touchstart', e => { y0 = e.touches[0].clientY; tgt = e.target; }, { passive: true });
-  v.addEventListener('touchend', e => {
-    if (y0 == null) return; const dy = y0 - e.changedTouches[0].clientY; y0 = null;
-    if (dy > 80 && canNavigate() && !(tgt && tgt.closest && tgt.closest('#shutter'))) { lockNav(); showView('feed'); }
-  }, { passive: true });
-})();
-
-/* ============ Khởi động ============ */
-renderUser(); refreshCamUI();
-creds() ? hideLogin() : showLogin();
-showView('upload'); startCamera(); requestAnimationFrame(fxLoop); loadLastThumb();
+window.addEventListener('load', () => {
+  renderUser(); 
+  refreshCamUI();
+  applySettings();
+  
+  if (creds()) {
+    hideLogin();
+    loadLastThumb();
+  } else {
+    showLogin();
+  }
+  
+  showView('upload'); 
+  startCamera(); 
+  requestAnimationFrame(fxLoop);
+});
 </script>
 </body>
 </html>
