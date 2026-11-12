@@ -993,70 +993,116 @@ function drawFaceFx(x, key, size, t, vw, vh, s) {
   drawFace(x, key, L, size, t);
 }
 
-/* ===== Hiệu ứng trái tim: đưa hai tay tạo hình trái tim vào camera ===== */
+/* ===== Hiệu ứng trái tim (Tối ưu theo hình mẫu, chống spam, không giật lag) ===== */
 const MP_HAND_MODEL = 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
 let handLm = null, handLoading = null, lastHandVid = -1, lastHandTs = 0, heartStable = 0, lastBurst = 0, lastHeartSeen = 0, lastStep = 0;
-const hearts = [], HEART_COLS = ['#ff6b8b', '#ff4d6d', '#ff8fa3', '#e8184d'];
+const hearts = [];
+
 function ensureHands() {
   if (handLm) return Promise.resolve(handLm);
   if (handLoading) return handLoading;
-  toast('Đang tải bộ nhận diện bàn tay (lần đầu khoảng 8MB)...', 9000);
+  toast('Đang tải bộ nhận diện bàn tay...', 5000);
   handLoading = (async () => {
     const mod = await import(MP_BASE + '/vision_bundle.mjs'), fs = await mod.FilesetResolver.forVisionTasks(MP_BASE + '/wasm');
     const make = d => mod.HandLandmarker.createFromOptions(fs, { baseOptions: { modelAssetPath: MP_HAND_MODEL, delegate: d }, runningMode: 'VIDEO', numHands: 2 });
     try { handLm = await make('GPU'); } catch { handLm = await make('CPU'); }
-    toast('✅ Sẵn sàng: đưa hai tay tạo hình trái tim vào camera', 3500); return handLm;
-  })().catch(e => { handLoading = null; recMode.effect = 'none'; syncRecFx(); if ($('recFx')) renderRec(); refreshCamUI(); toast('❌ Không tải được bộ nhận diện bàn tay: ' + (e && e.message || e), 7000); });
+    toast('✅ Sẵn sàng: đưa hai tay tạo hình trái tim', 2500); return handLm;
+  })().catch(e => { handLoading = null; recMode.effect = 'none'; syncRecFx(); if ($('recFx')) renderRec(); refreshCamUI(); });
   return handLoading;
 }
-// Hai tay tạo hình trái tim: hai đầu ngón trỏ chạm nhau ở trên, hai đầu ngón cái chạm nhau ở dưới, cổ tay xa nhau
+
 function heartGesture(hands, vw, vh) {
   if (!hands || hands.length < 2) return null;
   const P = (h, i) => ({ x: h[i].x * vw, y: h[i].y * vh }), d = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
-  for (let i = 0; i < hands.length; i++) for (let j = i + 1; j < hands.length; j++) {
-    const A = hands[i], B = hands[j], size = (d(P(A, 0), P(A, 9)) + d(P(B, 0), P(B, 9))) / 2;
-    if (size < vh * .04) continue;
-    const ia = P(A, 8), ib = P(B, 8), ta = P(A, 4), tb = P(B, 4);
-    const idx = d(ia, ib) / size, th = d(ta, tb) / size, vert = ((ta.y + tb.y) / 2 - (ia.y + ib.y) / 2) / size, wr = d(P(A, 0), P(B, 0)) / size;
-    if (idx < .6 && th < .7 && vert > .35 && wr > 1.2) return { x: (ia.x + ib.x + ta.x + tb.x) / 4 / vw, y: (ia.y + ib.y + ta.y + tb.y) / 4 / vh };
+  for (let i = 0; i < hands.length; i++) {
+    for (let j = i + 1; j < hands.length; j++) {
+      const A = hands[i], B = hands[j], size = (d(P(A, 0), P(A, 9)) + d(P(B, 0), P(B, 9))) / 2;
+      if (size < vh * .04) continue;
+      const ia = P(A, 8), ib = P(B, 8), ta = P(A, 4), tb = P(B, 4);
+      const idx = d(ia, ib) / size, th = d(ta, tb) / size, vert = ((ta.y + tb.y) / 2 - (ia.y + ib.y) / 2) / size, wr = d(P(A, 0), P(B, 0)) / size;
+      if (idx < .6 && th < .7 && vert > .35 && wr > 1.2) return { x: (ia.x + ib.x + ta.x + tb.x) / 4 / vw, y: (ia.y + ib.y + ta.y + tb.y) / 4 / vh };
+    }
   }
   return null;
 }
-function burstHearts(cx, cy, n) {   // toạ độ chuẩn hoá 0..1 trên khung vuông, vẽ được ở mọi độ phân giải
+
+// Chỉ bắn đúng 8 trái tim màu đỏ tươi, mềm mại bay lên
+function burstHearts(cx, cy) {
   const now = performance.now();
-  for (let i = 0; i < n; i++) {
-    const a = Math.random() * Math.PI * 2, sp = .22 + Math.random() * .6;
-    hearts.push({ x: cx, y: cy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - .2, s: .035 + Math.random() * .08, rot: (Math.random() - .5) * .9, vr: (Math.random() - .5) * 1.4, born: now, life: 1500 + Math.random() * 1400, c: i });
+  // Chống spam: giới hạn cách nhau tối thiểu 2.5 giây mới bắn đợt tiếp theo
+  if (now - lastBurst < 2500) return;
+  lastBurst = now;
+
+  for (let i = 0; i < 8; i++) {
+    const a = -Math.PI / 2 + (i - 3.5) * 0.22 + (Math.random() - 0.5) * 0.15;
+    const sp = 0.15 + Math.random() * 0.2;
+    hearts.push({
+      x: cx + (Math.random() - 0.5) * 0.1,
+      y: cy + (Math.random() - 0.5) * 0.05,
+      vx: Math.cos(a) * sp,
+      vy: Math.sin(a) * sp - 0.25,
+      s: 0.08 + Math.random() * 0.04, // Kích thước trái tim lớn giống ảnh mẫu
+      rot: (Math.random() - .5) * 0.4,
+      vr: (Math.random() - .5) * 0.5,
+      born: now,
+      life: 2000 + Math.random() * 800
+    });
   }
-  if (hearts.length > 170) hearts.splice(0, hearts.length - 170);
+  if (hearts.length > 16) hearts.splice(0, hearts.length - 16); // Giữ mảng luôn gọn nhẹ
 }
+
 function stepHearts(t) {
   const dt = Math.min(.05, (t - lastStep) / 1000); lastStep = t; if (dt <= 0) return;
   for (let i = hearts.length - 1; i >= 0; i--) {
-    const h = hearts[i]; if (t - h.born > h.life) { hearts.splice(i, 1); continue; }
-    h.x += h.vx * dt; h.y += h.vy * dt; h.vx *= 1 - 1.1 * dt; h.vy = h.vy * (1 - 1.1 * dt) - .12 * dt; h.rot += h.vr * dt;
+    const h = hearts[i]; 
+    if (t - h.born > h.life) { hearts.splice(i, 1); continue; }
+    h.x += h.vx * dt; 
+    h.y += h.vy * dt; 
+    h.rot += h.vr * dt;
   }
 }
+
 function drawHearts(x, size, t) {
   hearts.forEach(h => {
-    const age = (t - h.born) / h.life; if (age < 0 || age > 1) return;
-    const a = Math.max(0, 1 - Math.pow(age, 2.2)), s = h.s * size * (.45 + .55 * Math.min(1, (t - h.born) / 220));
-    x.save(); x.translate(h.x * size, h.y * size); x.rotate(h.rot); x.globalAlpha = a; x.shadowColor = 'rgba(110,0,30,.35)'; x.shadowBlur = s * .35;
-    const g = x.createRadialGradient(-s * .4, -s * .55, s * .08, 0, 0, s * 1.6); g.addColorStop(0, '#ffe1e8'); g.addColorStop(.3, HEART_COLS[h.c % 4]); g.addColorStop(1, '#a30f36');
-    fHeart(x, 0, 0, s); x.fillStyle = g; x.fill(); x.shadowBlur = 0;
-    x.beginPath(); x.ellipse(-s * .55, -s * .55, s * .26, s * .14, -.7, 0, 7); x.fillStyle = 'rgba(255,255,255,.65)'; x.fill(); x.restore();
+    const age = (t - h.born) / h.life; 
+    if (age < 0 || age > 1) return;
+    // Hiệu ứng mờ dần khi bay lên cao
+    const alpha = age < 0.2 ? age * 5 : (age > 0.7 ? (1 - age) / 0.3 : 1);
+    const s = h.s * size;
+
+    x.save(); 
+    x.translate(h.x * size, h.y * size); 
+    x.rotate(h.rot); 
+    x.globalAlpha = alpha * 0.95;
+    
+    // Màu đỏ tươi thuần, viền mềm giống hệt ảnh mẫu TikTok bạn cung cấp
+    x.fillStyle = '#ff2d46';
+    fHeart(x, 0, 0, s); 
+    x.fill(); 
+    
+    x.restore();
   });
 }
+
 function detectHands() {
   if (!FX.hearts || !handLm || video.readyState < 2 || video.currentTime === lastHandVid) return;
-  lastHandVid = video.currentTime; const ts = Math.round(performance.now()); if (ts <= lastHandTs) return; lastHandTs = ts;
+  
+  const ts = Math.round(performance.now());
+  // Giới hạn tần suất quét (chỉ quét khoảng 5-6 lần mỗi giây để tiết kiệm tài nguyên, chống giật lag)
+  if (ts - lastHandTs < 180) return; 
+  lastHandTs = ts;
+  lastHandVid = video.currentTime;
+
   try {
     const r = handLm.detectForVideo(video, ts), vw = video.videoWidth, vh = video.videoHeight, g = heartGesture(r.landmarks, vw, vh);
-    heartStable = g ? heartStable + 1 : 0; if (heartStable < 2) return;       // cần thấy liên tiếp 2 khung để tránh nhận nhầm
-    const now = performance.now(), s = Math.min(vw, vh), cx = (g.x * vw - (vw - s) / 2) / s, cy = (g.y * vh - (vh - s) / 2) / s, fresh = now - lastHeartSeen > 600;
-    lastHeartSeen = now;
-    if (fresh && now - lastBurst > 800) { burstHearts(cx, cy, 42); lastBurst = now; }        // vừa đưa tay vào: bắn nhiều tim
-    else if (now - lastBurst > 650) { burstHearts(cx, cy, 16); lastBurst = now; }             // giữ nguyên tư thế: tiếp tục bắn
+    heartStable = g ? heartStable + 1 : 0; 
+    if (heartStable < 2) return;       
+    
+    const now = performance.now(), s = Math.min(vw, vh);
+    const cx = (g.x * vw - (vw - s) / 2) / s, cy = (g.y * vh - (vh - s) / 2) / s;
+    
+    // Kích hoạt bắn 8 tim
+    burstHearts(cx, cy);
   } catch { /* bỏ qua khung hình lỗi */ }
 }
 
